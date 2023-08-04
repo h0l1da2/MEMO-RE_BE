@@ -15,11 +15,11 @@ import sori.jakku.kkunkkyu.memore.service.inter.UserService;
 import sori.jakku.kkunkkyu.memore.service.inter.WebService;
 
 /**
- * 로그인, 회원가입
+ * 회원가입
  */
 @RestController
 @RequiredArgsConstructor
-public class UserController {
+public class UserSignUpController {
 
     private final UserService userService;
     private final WebService webService;
