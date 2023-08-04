@@ -31,7 +31,14 @@ public class UserController {
      */
     @PostMapping("/usernameValid")
     public ResponseEntity<String> usernameValid(@RequestBody String username) {
-        boolean valid = userService.usernameDupl(username);
+        boolean valid = false;
+        JsonObject jsonObject = new JsonObject();
+        try {
+            valid = userService.usernameDupl(username);
+        } catch (UsernameDuplException e) {
+            jsonObject.addProperty("data", "USERNAME_DUPL");
+            return webService.badResponse(jsonObject);
+        }
         return validResponse(valid);
     }
 

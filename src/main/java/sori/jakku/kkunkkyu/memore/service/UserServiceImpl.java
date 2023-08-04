@@ -24,7 +24,7 @@ public class UserServiceImpl implements UserService {
     private final BCryptPasswordEncoder passwordEncoder;
 
     @Override
-    public boolean usernameDupl(String username) {
+    public boolean usernameDupl(String username) throws UsernameDuplException {
 
         try {
             username = webService.jsonToString(username, "username");
@@ -41,7 +41,7 @@ public class UserServiceImpl implements UserService {
         // 아이디 중복 검증
         User user = userRepository.findByUsername(username);
         if (user != null) {
-            return false;
+            throw new UsernameDuplException();
         }
 
         return true;
