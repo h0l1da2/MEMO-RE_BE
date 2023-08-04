@@ -5,9 +5,11 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import sori.jakku.kkunkkyu.memore.domain.dto.UserDto;
 import sori.jakku.kkunkkyu.memore.exception.PasswordNotValidException;
+import sori.jakku.kkunkkyu.memore.exception.UsernameDuplException;
 import sori.jakku.kkunkkyu.memore.exception.UsernameNotValidException;
 import sori.jakku.kkunkkyu.memore.service.inter.UserService;
 import sori.jakku.kkunkkyu.memore.service.inter.WebService;
@@ -28,19 +30,19 @@ public class UserController {
      * 회원 가입
      */
     @PostMapping("/usernameValid")
-    public ResponseEntity<String> usernameValid(String username) {
+    public ResponseEntity<String> usernameValid(@RequestBody String username) {
         boolean valid = userService.usernameDupl(username);
         return validResponse(valid);
     }
 
     @PostMapping("/pwdValid")
-    public ResponseEntity<String> pwdValid(String password) {
-        boolean valid = userService.pwdValid(password);
+    public ResponseEntity<String> pwdValid(@RequestBody String password) {
+        boolean valid = userService.pwdCheck(password);
         return validResponse(valid);
     }
 
     @PostMapping("/signUp")
-    public ResponseEntity<String> signUp(@Valid UserDto userDto) {
+    public ResponseEntity<String> signUp(@RequestBody @Valid UserDto userDto) {
         JsonObject jsonObject = new JsonObject();
         try {
 
@@ -54,6 +56,11 @@ public class UserController {
         } catch (PasswordNotValidException e) {
 
             jsonObject.addProperty("data", "BAD_PWD");
+            return webService.badResponse(jsonObject);
+
+        } catch (UsernameDuplException e) {
+
+            jsonObject.addProperty("data", "USERNAME_DUPL");
             return webService.badResponse(jsonObject);
 
         }
