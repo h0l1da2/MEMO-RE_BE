@@ -1,0 +1,23 @@
+### Username Valid
+POST http://localhost:8080/usernameValid
+Content-Type: application/json
+
+{
+  "username": "aaaa1"
+}
+### Pwd Valid
+POST http://localhost:8080/pwdValid
+Content-Type: application/json
+
+{
+  "password": "aaaa1"
+}
+### signUp
+POST http://localhost:8080/signUp
+Content-Type: application/json
+
+{
+  "username": "aaaa1",
+  "password": "aaaa1"
+}
+
