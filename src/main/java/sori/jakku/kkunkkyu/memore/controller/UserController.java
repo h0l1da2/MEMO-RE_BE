@@ -1,5 +1,6 @@
 package sori.jakku.kkunkkyu.memore.controller;
 
+import com.google.gson.JsonObject;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import sori.jakku.kkunkkyu.memore.domain.dto.UserDto;
 import sori.jakku.kkunkkyu.memore.exception.NotValidException;
 import sori.jakku.kkunkkyu.memore.service.inter.UserService;
+import sori.jakku.kkunkkyu.memore.service.inter.WebService;
 
 /**
  * 로그인, 회원가입
@@ -17,7 +19,7 @@ import sori.jakku.kkunkkyu.memore.service.inter.UserService;
 public class UserController {
 
     private final UserService userService;
-
+    private final WebService webService;
     /**
      * 요청이 3개가 온다.
      * 아이디 중복
@@ -25,9 +27,17 @@ public class UserController {
      * 회원 가입
      */
     @PostMapping("/usernameValid")
-    public ResponseEntity<UserDto> usernameValid(@Valid UserDto userDto) {
-        return null;
+    public ResponseEntity<String> usernameValid(@Valid UserDto userDto) {
+        boolean valid = userService.usernameDupl(userDto.getUsername());
+        JsonObject jsonObject = new JsonObject();
+        if (!valid) {
+            jsonObject.addProperty("data", "NOT_VALID");
+            return webService.badResponse(jsonObject);
+        }
+        jsonObject.addProperty("data", "OK_VALID");
+        return webService.okResponse(jsonObject);
     }
+
     @PostMapping("/pwdValid")
     public ResponseEntity<UserDto> pwdValid(@Valid UserDto userDto) {
         return null;
