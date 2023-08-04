@@ -1,21 +1,29 @@
 package sori.jakku.kkunkkyu.memore.service;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StreamUtils;
 import sori.jakku.kkunkkyu.memore.domain.User;
 import sori.jakku.kkunkkyu.memore.domain.dto.UserDto;
 import sori.jakku.kkunkkyu.memore.exception.NotValidException;
 import sori.jakku.kkunkkyu.memore.repository.UserRepository;
 import sori.jakku.kkunkkyu.memore.service.inter.UserService;
+import sori.jakku.kkunkkyu.memore.service.inter.WebService;
 
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final WebService webService;
 
     @Override
     public boolean usernameDupl(String username) {
+        username = webService.jsonToString(username, "username");
+
         // 아이디 조건 검증
         if (!usernameValid(username)){
             return false;
@@ -50,16 +58,21 @@ public class UserServiceImpl implements UserService {
          * 아이디
          * - 4자 이상
          * - 소문자, 숫자만
+         * - 공백 불허용
          */
+        if (!StringUtils.isNotBlank(username)) {
+            return false;
+        }
+
         if (username.length() < 3) {
-            return true;
+            return false;
         }
 
         for (char c : username.toCharArray()) {
-            if (!Character.isLowerCase(c) && !Character.isDigit(c)) {
-                return true;
+            if (!Character.isLowerCase(c) || !Character.isDigit(c)) {
+                return false;
             }
         }
-        return false;
+        return true;
     }
 }

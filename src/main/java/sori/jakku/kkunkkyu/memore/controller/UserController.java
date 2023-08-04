@@ -27,8 +27,8 @@ public class UserController {
      * 회원 가입
      */
     @PostMapping("/usernameValid")
-    public ResponseEntity<String> usernameValid(@Valid UserDto userDto) {
-        boolean valid = userService.usernameDupl(userDto.getUsername());
+    public ResponseEntity<String> usernameValid(String username) {
+        boolean valid = userService.usernameDupl(username);
         JsonObject jsonObject = new JsonObject();
         if (!valid) {
             jsonObject.addProperty("data", "NOT_VALID");
