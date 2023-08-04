@@ -5,7 +5,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import sori.jakku.kkunkkyu.memore.domain.User;
 import sori.jakku.kkunkkyu.memore.domain.dto.UserDto;
-import sori.jakku.kkunkkyu.memore.exception.NotValidException;
+import sori.jakku.kkunkkyu.memore.exception.PasswordNotValidException;
+import sori.jakku.kkunkkyu.memore.exception.UsernameNotValidException;
 import sori.jakku.kkunkkyu.memore.repository.UserRepository;
 import sori.jakku.kkunkkyu.memore.service.inter.UserService;
 import sori.jakku.kkunkkyu.memore.service.inter.WebService;
@@ -62,10 +63,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto signUp(UserDto userDto) throws NotValidException {
+    public UserDto signUp(UserDto userDto) throws UsernameNotValidException, PasswordNotValidException {
         /**
          * 아이디, 패스워드 valid 확인 후 저장
          */
+
+        if (!usernameValid(userDto.getUsername())) {
+            throw new UsernameNotValidException();
+        }
+
+        if (!pwdValid(userDto.getPassword())) {
+            throw new PasswordNotValidException();
+        }
+
         User user = userRepository.save(new User(userDto));
         return new UserDto(user);
     }

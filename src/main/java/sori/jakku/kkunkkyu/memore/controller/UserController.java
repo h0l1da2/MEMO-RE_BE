@@ -7,7 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import sori.jakku.kkunkkyu.memore.domain.dto.UserDto;
-import sori.jakku.kkunkkyu.memore.exception.NotValidException;
+import sori.jakku.kkunkkyu.memore.exception.PasswordNotValidException;
+import sori.jakku.kkunkkyu.memore.exception.UsernameNotValidException;
 import sori.jakku.kkunkkyu.memore.service.inter.UserService;
 import sori.jakku.kkunkkyu.memore.service.inter.WebService;
 
@@ -39,11 +40,26 @@ public class UserController {
     }
 
     @PostMapping("/signUp")
-    public ResponseEntity<UserDto> signUp(@Valid UserDto userDto) throws NotValidException {
+    public ResponseEntity<String> signUp(@Valid UserDto userDto) {
+        JsonObject jsonObject = new JsonObject();
+        try {
 
-        UserDto signUser = userService.signUp(userDto);
+            userService.signUp(userDto);
 
-        return null;
+        } catch (UsernameNotValidException e) {
+
+            jsonObject.addProperty("data", "BAD_USERNAME");
+            return webService.badResponse(jsonObject);
+
+        } catch (PasswordNotValidException e) {
+
+            jsonObject.addProperty("data", "BAD_PWD");
+            return webService.badResponse(jsonObject);
+
+        }
+
+        jsonObject.addProperty("data", "OK");
+        return webService.okResponse(jsonObject);
     }
 
     private ResponseEntity<String> validResponse(boolean valid) {
@@ -52,7 +68,7 @@ public class UserController {
             jsonObject.addProperty("data", "NOT_VALID");
             return webService.badResponse(jsonObject);
         }
-        jsonObject.addProperty("data", "OK_VALID");
+        jsonObject.addProperty("data", "OK");
         return webService.okResponse(jsonObject);
     }
 }
