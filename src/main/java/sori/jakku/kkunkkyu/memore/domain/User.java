@@ -5,6 +5,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import sori.jakku.kkunkkyu.memore.domain.dto.UserDto;
 
 @Entity
 @Getter
@@ -19,5 +20,10 @@ public class User {
     public User(String username, String password) {
         this.username = username;
         this.password = password;
+    }
+
+    public User(UserDto userDto) {
+        this.username = userDto.getUsername();
+        this.password = userDto.getPassword();
     }
 }
