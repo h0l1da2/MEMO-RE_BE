@@ -29,19 +29,15 @@ public class UserController {
     @PostMapping("/usernameValid")
     public ResponseEntity<String> usernameValid(String username) {
         boolean valid = userService.usernameDupl(username);
-        JsonObject jsonObject = new JsonObject();
-        if (!valid) {
-            jsonObject.addProperty("data", "NOT_VALID");
-            return webService.badResponse(jsonObject);
-        }
-        jsonObject.addProperty("data", "OK_VALID");
-        return webService.okResponse(jsonObject);
+        return validResponse(valid);
     }
 
     @PostMapping("/pwdValid")
-    public ResponseEntity<UserDto> pwdValid(@Valid UserDto userDto) {
-        return null;
+    public ResponseEntity<String> pwdValid(String password) {
+        boolean valid = userService.pwdValid(password);
+        return validResponse(valid);
     }
+
     @PostMapping("/signUp")
     public ResponseEntity<UserDto> signUp(@Valid UserDto userDto) throws NotValidException {
 
@@ -50,4 +46,13 @@ public class UserController {
         return null;
     }
 
+    private ResponseEntity<String> validResponse(boolean valid) {
+        JsonObject jsonObject = new JsonObject();
+        if (!valid) {
+            jsonObject.addProperty("data", "NOT_VALID");
+            return webService.badResponse(jsonObject);
+        }
+        jsonObject.addProperty("data", "OK_VALID");
+        return webService.okResponse(jsonObject);
+    }
 }

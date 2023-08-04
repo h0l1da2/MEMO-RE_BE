@@ -1,11 +1,8 @@
 package sori.jakku.kkunkkyu.memore.service;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StreamUtils;
 import sori.jakku.kkunkkyu.memore.domain.User;
 import sori.jakku.kkunkkyu.memore.domain.dto.UserDto;
 import sori.jakku.kkunkkyu.memore.exception.NotValidException;
@@ -40,12 +37,32 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean pwdValid(String password) {
-        return false;
+        password = webService.jsonToString(password, "password");
+        /**
+         * 패스워드
+         * - 6자 이상
+         * - 공백 불허용
+         * - 대소문자, 숫자
+         */
+        if (!StringUtils.isNotBlank(password)) {
+            return false;
+        }
+
+        if (password.length() < 5) {
+            return false;
+        }
+
+        for (char c : password.toCharArray()) {
+            if (!Character.isLetterOrDigit(c)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     @Override
     public UserDto signUp(UserDto userDto) throws NotValidException {
-
         /**
          * 아이디, 패스워드 valid 확인 후 저장
          */
@@ -69,7 +86,7 @@ public class UserServiceImpl implements UserService {
         }
 
         for (char c : username.toCharArray()) {
-            if (!Character.isLowerCase(c) || !Character.isDigit(c)) {
+            if (!Character.isLowerCase(c) && !Character.isDigit(c)) {
                 return false;
             }
         }
