@@ -2,6 +2,7 @@ package sori.jakku.kkunkkyu.memore.service;
 
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import sori.jakku.kkunkkyu.memore.domain.User;
 import sori.jakku.kkunkkyu.memore.domain.dto.UserDto;
@@ -17,6 +18,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final WebService webService;
+    private final BCryptPasswordEncoder passwordEncoder;
 
     @Override
     public boolean usernameDupl(String username) {
@@ -76,6 +78,7 @@ public class UserServiceImpl implements UserService {
             throw new PasswordNotValidException();
         }
 
+        userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
         User user = userRepository.save(new User(userDto));
         return new UserDto(user);
     }
