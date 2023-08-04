@@ -17,7 +17,108 @@ POST http://localhost:8080/signUp
 Content-Type: application/json
 
 {
-  "username": "aaaa1",
+  "username": "aaaa12",
   "password": "aaaa1"
 }
 
+
+
+
+### Username Valid Failed (4자 이하)
+POST http://localhost:8080/usernameValid
+Content-Type: application/json
+
+{
+  "username": "aa1"
+}
+### Username Valid Failed (15자 초과)
+POST http://localhost:8080/usernameValid
+Content-Type: application/json
+
+{
+  "username": "1234567890asdfgh"
+}
+### Username Valid Failed (특수문자)
+POST http://localhost:8080/usernameValid
+Content-Type: application/json
+
+{
+  "username": "@#asd1"
+}
+### Username Valid Failed (공백)
+POST http://localhost:8080/usernameValid
+Content-Type: application/json
+
+{
+  "username": "aaaa 1"
+}
+### Username Valid Failed (NULL)
+POST http://localhost:8080/usernameValid
+Content-Type: application/json
+
+{
+}
+
+
+### Pwd Valid Failed (6자 이하)
+POST http://localhost:8080/pwdValid
+Content-Type: application/json
+
+{
+  "password": "aaaa1"
+}
+### Pwd Valid Failed (15자 초과)
+POST http://localhost:8080/pwdValid
+Content-Type: application/json
+
+{
+  "password": "aaaa1"
+}
+### Pwd Valid Failed (특수문자)
+POST http://localhost:8080/pwdValid
+Content-Type: application/json
+
+{
+  "password": "aaaa1"
+}
+### Pwd Valid Failed (공백)
+POST http://localhost:8080/pwdValid
+Content-Type: application/json
+
+{
+  "password": "aaaa1"
+}
+### Pwd Valid Failed (NULL)
+POST http://localhost:8080/pwdValid
+Content-Type: application/json
+
+{
+  "password": "aaaa1"
+}
+
+
+
+### signUp (아이디 이상한 거)
+POST http://localhost:8080/signUp
+Content-Type: application/json
+
+{
+  "username": "aa2",
+  "password": "aaaa1555"
+}
+### signUp (비밀번호 이상한 거)
+POST http://localhost:8080/signUp
+Content-Type: application/json
+
+{
+  "username": "aaaa12",
+  "password": "aaaa#$1"
+}
+### signUp (중복 아이디)
+POST http://localhost:8080/signUp
+Content-Type: application/json
+
+{
+  "username": "aaaa12",
+  "password": "aaaa123"
+}
