@@ -2,6 +2,7 @@ package sori.jakku.kkunkkyu.memore.service;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -25,5 +26,12 @@ public class WebServiceImpl implements WebService {
         String json = gson.toJson(jsonObject);
         return ResponseEntity.badRequest()
                 .body(json);
+    }
+
+    @Override
+    public String jsonToString(String json, String value) {
+        JsonObject jsonObject = JsonParser.parseString(json).getAsJsonObject();
+        return jsonObject.get(value).getAsString();
+
     }
 }
