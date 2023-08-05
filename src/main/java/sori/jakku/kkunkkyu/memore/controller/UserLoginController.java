@@ -1,6 +1,8 @@
 package sori.jakku.kkunkkyu.memore.controller;
 
 import com.google.gson.JsonObject;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -31,7 +33,7 @@ public class UserLoginController {
     private final TokenService tokenService;
 
     @PostMapping
-    public ResponseEntity<String> login(@RequestBody @Valid UserDto userDto) {
+    public ResponseEntity<String> login(@RequestBody @Valid UserDto userDto, HttpServletRequest request) {
 
         /**
          * 아이디 비밀번호 확인
@@ -50,12 +52,14 @@ public class UserLoginController {
             String token = tokenService.creatToken(userDto.getUsername());
             jsonObject.addProperty("token", token);
 
+            // 세션에 등록
+            HttpSession session = request.getSession();
+            session.setAttribute("id", user.getId());
+
         } catch (LoginException e) {
             jsonObject.addProperty("response", "LOGIN_FAIL");
             return webService.badResponse(jsonObject);
         }
-
-
 
         jsonObject.addProperty("response", "OK");
         return webService.okResponse(jsonObject);
