@@ -85,6 +85,22 @@ public class UserServiceImpl implements UserService {
         return new UserDto(user);
     }
 
+    @Override
+    public boolean login(UserDto userDto) {
+
+        User findUser = userRepository.findByUsername(userDto.getUsername());
+        if (findUser == null) {
+            return false;
+        }
+
+        return passwordEncoder.matches(userDto.getPassword(), findUser.getPassword());
+    }
+
+    @Override
+    public User getUserByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
+
     private boolean usernameValid(String username) throws NullPointerException {
         /**
          * 아이디
