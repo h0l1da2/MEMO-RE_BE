@@ -36,7 +36,7 @@ public class UserSignUpController {
         try {
             valid = userService.usernameDupl(username);
         } catch (UsernameDuplException e) {
-            jsonObject.addProperty("data", "USERNAME_DUPL");
+            jsonObject.addProperty("response", "USERNAME_DUPL");
             return webService.badResponse(jsonObject);
         }
         return validResponse(valid);
@@ -57,32 +57,32 @@ public class UserSignUpController {
 
         } catch (UsernameNotValidException e) {
 
-            jsonObject.addProperty("data", "BAD_USERNAME");
+            jsonObject.addProperty("response", "BAD_USERNAME");
             return webService.badResponse(jsonObject);
 
         } catch (PasswordNotValidException e) {
 
-            jsonObject.addProperty("data", "BAD_PWD");
+            jsonObject.addProperty("response", "BAD_PWD");
             return webService.badResponse(jsonObject);
 
         } catch (UsernameDuplException e) {
 
-            jsonObject.addProperty("data", "USERNAME_DUPL");
+            jsonObject.addProperty("response", "USERNAME_DUPL");
             return webService.badResponse(jsonObject);
 
         }
 
-        jsonObject.addProperty("data", "OK");
+        jsonObject.addProperty("response", "OK");
         return webService.okResponse(jsonObject);
     }
 
     private ResponseEntity<String> validResponse(boolean valid) {
         JsonObject jsonObject = new JsonObject();
         if (!valid) {
-            jsonObject.addProperty("data", "NOT_VALID");
+            jsonObject.addProperty("response", "NOT_VALID");
             return webService.badResponse(jsonObject);
         }
-        jsonObject.addProperty("data", "OK");
+        jsonObject.addProperty("response", "OK");
         return webService.okResponse(jsonObject);
     }
 }
