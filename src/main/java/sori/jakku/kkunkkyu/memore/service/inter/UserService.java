@@ -14,4 +14,5 @@ public interface UserService {
     // 회원가입
     UserDto signUp(UserDto userDto) throws UsernameNotValidException, PasswordNotValidException, UsernameDuplException;
     User login(UserDto userDto) throws LoginException;
+    User userByUsername(String username);
 }
