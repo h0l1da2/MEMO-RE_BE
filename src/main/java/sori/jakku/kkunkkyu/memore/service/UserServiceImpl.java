@@ -14,6 +14,8 @@ import sori.jakku.kkunkkyu.memore.repository.UserRepository;
 import sori.jakku.kkunkkyu.memore.service.inter.UserService;
 import sori.jakku.kkunkkyu.memore.service.inter.WebService;
 
+import javax.security.auth.login.LoginException;
+
 @Service
 @RequiredArgsConstructor
 @Log4j2
@@ -86,14 +88,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean login(UserDto userDto) {
+    public User login(UserDto userDto) throws LoginException {
 
         User findUser = userRepository.findByUsername(userDto.getUsername());
         if (findUser == null) {
-            return false;
+            throw new LoginException("유저 이름 찾을 수 없음");
         }
 
-        return passwordEncoder.matches(userDto.getPassword(), findUser.getPassword());
+        boolean matches = passwordEncoder.matches(userDto.getPassword(), findUser.getPassword());
+        if (!matches) {
+            throw new LoginException("비밀번호 다름");
+        }
+
+        return findUser;
     }
 
     private boolean usernameValid(String username) throws NullPointerException {

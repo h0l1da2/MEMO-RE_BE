@@ -10,9 +10,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import sori.jakku.kkunkkyu.memore.config.jwt.TokenService;
+import sori.jakku.kkunkkyu.memore.domain.User;
 import sori.jakku.kkunkkyu.memore.domain.dto.UserDto;
 import sori.jakku.kkunkkyu.memore.service.inter.UserService;
 import sori.jakku.kkunkkyu.memore.service.inter.WebService;
+
+import javax.security.auth.login.LoginException;
 
 /**
  * 회원가입
@@ -39,16 +42,20 @@ public class UserLoginController {
 
         JsonObject jsonObject = new JsonObject();
 
-        // 아이디 비밀번호 확인
-        boolean loginValid = userService.login(userDto);
-        if (!loginValid) {
+        try {
+            // 아이디 비밀번호 확인
+            User user = userService.login(userDto);
+
+            // 토큰 생성
+            String token = tokenService.creatToken(userDto.getUsername());
+            jsonObject.addProperty("token", token);
+
+        } catch (LoginException e) {
             jsonObject.addProperty("response", "LOGIN_FAIL");
             return webService.badResponse(jsonObject);
         }
 
-        // 토큰 생성
-        String token = tokenService.creatToken(userDto.getUsername());
-        jsonObject.addProperty("token", token);
+
 
         jsonObject.addProperty("response", "OK");
         return webService.okResponse(jsonObject);

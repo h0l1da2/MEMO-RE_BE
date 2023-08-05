@@ -6,10 +6,12 @@ import sori.jakku.kkunkkyu.memore.exception.PasswordNotValidException;
 import sori.jakku.kkunkkyu.memore.exception.UsernameDuplException;
 import sori.jakku.kkunkkyu.memore.exception.UsernameNotValidException;
 
+import javax.security.auth.login.LoginException;
+
 public interface UserService {
     boolean usernameDupl(String username) throws UsernameDuplException;
     boolean pwdCheck(String password);
     // 회원가입
     UserDto signUp(UserDto userDto) throws UsernameNotValidException, PasswordNotValidException, UsernameDuplException;
-    boolean login(UserDto userDto);
+    User login(UserDto userDto) throws LoginException;
 }
