@@ -1,10 +1,10 @@
 package sori.jakku.kkunkkyu.memore.service;
 
-import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import sori.jakku.kkunkkyu.memore.domain.User;
 import sori.jakku.kkunkkyu.memore.domain.dto.UserDto;
 import sori.jakku.kkunkkyu.memore.exception.PasswordNotValidException;
@@ -110,7 +110,7 @@ public class UserServiceImpl implements UserService {
          * - 소문자, 숫자만
          * - 공백 불허용
          */
-        if (!StringUtils.isNotBlank(username)) {
+        if (!StringUtils.hasText(username)) {
             return false;
         }
 
@@ -133,7 +133,7 @@ public class UserServiceImpl implements UserService {
          * - 공백 불허용
          * - 대소문자, 숫자
          */
-        if (!StringUtils.isNotBlank(password)) {
+        if (!StringUtils.hasText(password)) {
             return false;
         }
 
