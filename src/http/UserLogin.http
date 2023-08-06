@@ -1,0 +1,26 @@
+### Login Success
+POST http://localhost:8080/login
+Content-Type: application/json
+
+{
+  "username": "aaaa1",
+  "password": "a12345"
+}
+
+### Login Filed (username)
+POST http://localhost:8080/login
+Content-Type: application/json
+
+{
+  "username": "aaaa12",
+  "password": "a12345"
+}
+
+### Login Failed (password)
+POST http://localhost:8080/login
+Content-Type: application/json
+
+{
+  "username": "aaaa12",
+  "password": "a1234544"
+}

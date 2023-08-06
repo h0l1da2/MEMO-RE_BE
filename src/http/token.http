@@ -1,0 +1,35 @@
+### signUp
+POST http://localhost:8080/signUp
+Content-Type: application/json
+
+{
+  "username": "aaaa1",
+  "password": "a12345"
+}
+
+### Login Success
+POST http://localhost:8080/login
+Content-Type: application/json
+
+{
+  "username": "aaaa1",
+  "password": "a12345"
+}
+
+
+### Token Success
+POST http://localhost:8080/test/token
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJCZWFyZXIiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhY2Nlc3NUb2tlbiIsImlhdCI6MTY5MTMxMjY3MCwiZXhwIjoxNjkxMzE1MjYyLCJ1c2VybmFtZSI6ImFhYWExIiwicm9sZSI6IltST0xFX1VTRVJdIn0.6Sf9fE7Nek7-ncGTGDOJvmy-ebARfD3M_gS9YGTzZnY6lqvjxsI8u32UFUBvKgkpSDreHwLKp-GKXF0EK5BkUQ
+
+{
+
+}
+
+#### Token Failed
+#POST http://localhost:8080/login
+#Content-Type: application/json
+#
+#{
+#  "token": "aaaa12"
+#}
