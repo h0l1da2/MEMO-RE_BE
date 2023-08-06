@@ -13,6 +13,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -38,10 +39,12 @@ public class JwtFilter extends OncePerRequestFilter {
 
         // 토큰 존재 여부 확인
         String token = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (token == null) {
+        if (!StringUtils.hasText(token)) {
             filterChain.doFilter(request, response);
             return;
         }
+
+        token = token.substring("Bearer ".length());
 
         // 토큰 유효 확인
         boolean valid = tokenService.tokenValid(token);
@@ -55,7 +58,6 @@ public class JwtFilter extends OncePerRequestFilter {
 
         // 토큰 재생성
         String reCreateToken = tokenService.reCreateToken(token);
-
         // 쿠키 셋팅
         Cookie cookie = new Cookie("token", reCreateToken);
         response.addCookie(cookie);
@@ -63,7 +65,7 @@ public class JwtFilter extends OncePerRequestFilter {
         // Authentication 생성
         String username = tokenService.usernameByToken(token);
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, token);
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, token, userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         filterChain.doFilter(request, response);

@@ -46,6 +46,7 @@ public class TokenProvider {
                 .setExpiration(new Date(now.getTime() + tokenValidTime));
 
         claims.put("username", username);
+        claims.put("role", "[ROLE_USER]");
         return claims;
     }
 }
