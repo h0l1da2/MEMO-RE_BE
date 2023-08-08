@@ -12,4 +12,13 @@ public class TagDto {
     private String tagB;
     @NotBlank
     private String tagC;
+
+    public TagDto() {
+    }
+
+    public TagDto(String tagA, String tagB, String tagC) {
+        this.tagA = tagA;
+        this.tagB = tagB;
+        this.tagC = tagC;
+    }
 }
