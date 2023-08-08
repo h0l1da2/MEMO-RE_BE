@@ -50,7 +50,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public void writeTag(Long id, String name) throws UserNotFoundException, ConditionNotMatchException {
+    public String writeTag(Long id, String name) throws UserNotFoundException, ConditionNotMatchException {
         /**
          * 유저 찾고 이름 검증 후, 태그 생성 및 DB INSERT
          */
@@ -59,12 +59,18 @@ public class TagServiceImpl implements TagService {
             throw new UserNotFoundException();
         }
 
-        if (!StringUtils.hasText(name) || 10 < name.length()) {
+        // 한글이나 영어가 포함되어있지 않다면
+        if (!name.matches(".*[ㄱ-ㅎㅏ-ㅣ가-힣]+.*") |
+                name.matches(".*[a-zA-Z]+.*") |
+                name.matches(".*\\d+.*") |
+                name.equals("null") |
+                10 < name.length()) {
             throw new ConditionNotMatchException();
         }
 
-        tagRepository.save(new Tag(user, name));
+        Tag tag = tagRepository.save(new Tag(user, name));
 
+        return tag.getName();
     }
 
     private boolean validTag(TagDto tagDto) throws ConditionNotMatchException {
