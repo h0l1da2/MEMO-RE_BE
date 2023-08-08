@@ -108,6 +108,11 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByUsername(username);
     }
 
+    @Override
+    public User userById(Long id) {
+        return userRepository.findById(id).orElse(null);
+    }
+
     private boolean usernameValid(String username) throws NullPointerException {
         /**
          * 아이디

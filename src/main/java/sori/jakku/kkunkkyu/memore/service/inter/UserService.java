@@ -15,4 +15,5 @@ public interface UserService {
     UserDto signUp(UserDto userDto) throws UsernameNotValidException, PasswordNotValidException, UsernameDuplException;
     User login(UserDto userDto) throws LoginException;
     User userByUsername(String username);
+    User userById(Long id);
 }
