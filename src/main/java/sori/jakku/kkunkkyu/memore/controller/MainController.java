@@ -18,9 +18,9 @@ import sori.jakku.kkunkkyu.memore.service.inter.WebService;
 
 @Slf4j
 @RestController
-@RequestMapping("/tag")
+@RequestMapping("/")
 @RequiredArgsConstructor
-public class TagController {
+public class MainController {
 
     private final TagService tagService;
     private final WebService webService;
@@ -59,4 +59,5 @@ public class TagController {
 
         return webService.okResponse(jsonObject);
     }
+
 }
