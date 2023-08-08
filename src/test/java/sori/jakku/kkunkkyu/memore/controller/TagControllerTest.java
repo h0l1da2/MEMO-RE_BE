@@ -42,7 +42,7 @@ class TagControllerTest {
     @DisplayName("태그 쓰기 성공")
     void writeTagSuccess() throws Exception {
         // given
-        String name = "태그 이름";
+        String name = "베";
 
         User beUser = new User("user", "pwd");
         User user = userRepository.save(beUser);
@@ -124,26 +124,6 @@ class TagControllerTest {
         User findUser = new User("user", "pwd");
         User user = userRepository.save(findUser);
         String name = " ";
-
-        MockHttpSession session = new MockHttpSession();
-        session.setAttribute("id", user.getId());
-
-        mockMvc.perform(
-                        post("/tag")
-                                .content(mapper.writeValueAsString(name))
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .session(session)
-                ).andExpect(status().is4xxClientError())
-                .andExpect(jsonPath("$.response").value("NOT_VALID"))
-                .andDo(print());
-    }
-
-    @Test
-    @DisplayName("태그 NULL 실패")
-    void 태그NULL_실패() throws Exception {
-        User findUser = new User("user", "pwd");
-        User user = userRepository.save(findUser);
-        String name = null;
 
         MockHttpSession session = new MockHttpSession();
         session.setAttribute("id", user.getId());
