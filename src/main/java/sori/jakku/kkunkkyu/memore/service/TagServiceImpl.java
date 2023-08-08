@@ -60,11 +60,10 @@ public class TagServiceImpl implements TagService {
         }
 
         // 한글이나 영어가 포함되어있지 않다면
-        if (!name.matches(".*[ㄱ-ㅎㅏ-ㅣ가-힣]+.*") |
-                name.matches(".*[a-zA-Z]+.*") |
-                name.matches(".*\\d+.*") |
-                name.equals("null") |
-                10 < name.length()) {
+        if (10 < name.length() |
+                (!name.matches(".*[ㄱ-ㅎㅏ-ㅣ가-힣]+.*") &&
+                !name.matches(".*[a-zA-Z]+.*") &&
+                !name.matches(".*\\d+.*"))) {
             throw new ConditionNotMatchException();
         }
 
