@@ -15,6 +15,7 @@ public class WebServiceImpl implements WebService {
     @Override
     public ResponseEntity<String> okResponse(JsonObject jsonObject) {
         Gson gson = new Gson();
+        jsonObject.addProperty("response", "OK");
         String json = gson.toJson(jsonObject);
         return ResponseEntity.ok()
                 .body(json);

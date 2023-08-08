@@ -61,7 +61,6 @@ public class UserLoginController {
             return webService.badResponse(jsonObject);
         }
 
-        jsonObject.addProperty("response", "OK");
         return webService.okResponse(jsonObject);
     }
 }

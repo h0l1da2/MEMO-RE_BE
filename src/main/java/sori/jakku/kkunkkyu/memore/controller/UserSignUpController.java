@@ -72,7 +72,6 @@ public class UserSignUpController {
 
         }
 
-        jsonObject.addProperty("response", "OK");
         return webService.okResponse(jsonObject);
     }
 
@@ -82,7 +81,6 @@ public class UserSignUpController {
             jsonObject.addProperty("response", "NOT_VALID");
             return webService.badResponse(jsonObject);
         }
-        jsonObject.addProperty("response", "OK");
         return webService.okResponse(jsonObject);
     }
 }
