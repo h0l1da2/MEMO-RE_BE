@@ -1,11 +1,13 @@
 package sori.jakku.kkunkkyu.memore.service;
 
 import com.google.gson.Gson;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import sori.jakku.kkunkkyu.memore.domain.Tag;
 import sori.jakku.kkunkkyu.memore.domain.User;
 import sori.jakku.kkunkkyu.memore.domain.dto.TagDto;
 import sori.jakku.kkunkkyu.memore.exception.ConditionNotMatchException;
@@ -78,5 +80,72 @@ class TagServiceImplTest {
                 ConditionNotMatchException.class, () ->
                 tagService.writeForMain(user.getId(), tagDto));
 
+    }
+
+    @Test
+    @DisplayName("태그 쓰기 성공")
+    void writeSuccess() throws UserNotFoundException, ConditionNotMatchException {
+        // given 유저, name
+        User user = new User("user", "pwd");
+        user = userRepository.save(user);
+        String name = "태그";
+        // when
+        name = tagService.writeTag(user.getId(), name);
+
+        // then
+        Tag tag = tagRepository.findById(1L).orElse(null);
+        assertThat(name).isNotNull();
+        assertThat(name).isEqualTo("태그");
+        assertThat(tag).isNotNull();
+        assertThat(tag.getName()).isEqualTo(name);
+    }
+    @Test
+    @DisplayName("태그 쓰기 실패 : 유저 로그인 X")
+    void writeLoginFail() throws ConditionNotMatchException {
+        // given 유저, name
+        String name = "태그";
+        // when then
+        Assertions.assertThrows(
+                UserNotFoundException.class, () ->
+                tagService.writeTag(1L, name));
+    }
+    @Test
+    @DisplayName("태그 쓰기 실패 : 태그 NULL X")
+    void writeNullFail() throws UserNotFoundException {
+        // given 유저, name
+        User user = new User("user", "pwd");
+        user = userRepository.save(user);
+        String name = null;
+        User finalUser = user;
+        // when then
+        Assertions.assertThrows(
+                ConditionNotMatchException.class, () ->
+                tagService.writeTag(finalUser.getId(), name));
+    }
+    @Test
+    @DisplayName("태그 쓰기 실패 : 태그 내용 없음")
+    void writeNotConFail() throws UserNotFoundException {
+        // given 유저, name
+        User user = new User("user", "pwd");
+        user = userRepository.save(user);
+        String name = "";
+        User finalUser = user;
+        // when then
+        Assertions.assertThrows(
+                ConditionNotMatchException.class, () ->
+                tagService.writeTag(finalUser.getId(), name));
+    }
+    @Test
+    @DisplayName("태그 쓰기 실패 : 태그 길이 Over")
+    void writeLengthOverFail() throws UserNotFoundException {
+        // given 유저, name
+        User user = new User("user", "pwd");
+        user = userRepository.save(user);
+        String name = "태그321312343242342323";
+        User finalUser = user;
+        // when then
+        Assertions.assertThrows(
+                ConditionNotMatchException.class, () ->
+                tagService.writeTag(finalUser.getId(), name));
     }
 }

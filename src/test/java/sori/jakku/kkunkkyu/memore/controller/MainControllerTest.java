@@ -53,7 +53,7 @@ class MainControllerTest {
 
         // expected
         mockMvc.perform(
-                        post("/tag")
+                        post("/")
                                 .session(session)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(mapper.writeValueAsString(tagDto))
@@ -75,7 +75,7 @@ class MainControllerTest {
 
         // expected
         mockMvc.perform(
-                        post("/tag")
+                        post("/")
                                 .session(session)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(mapper.writeValueAsString(tagDto))
@@ -96,7 +96,7 @@ class MainControllerTest {
 
         // expected
         mockMvc.perform(
-                        post("/tag")
+                        post("/")
                                 .session(session)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(mapper.writeValueAsString(tagDto))
