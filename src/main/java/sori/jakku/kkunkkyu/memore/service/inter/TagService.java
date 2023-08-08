@@ -6,4 +6,5 @@ import sori.jakku.kkunkkyu.memore.exception.UserNotFoundException;
 
 public interface TagService {
     String writeForMain(Long id, TagDto tagDto) throws UserNotFoundException, ConditionNotMatchException;
+    void writeTag(Long id, String name) throws UserNotFoundException, ConditionNotMatchException;
 }
