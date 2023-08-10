@@ -65,4 +65,18 @@ public class MemoServiceImpl implements MemoService {
 
         tagMemoRepository.updateMemoAndTag(memo, conTagUpdateDto);
     }
+
+    @Override
+    public void removeMemo(Long id, String keyword) throws MemoNotFoundException, UserNotFoundException {
+        User user = userService.userById(id);
+
+        Memo memo = memoRepository.findByKeyword(keyword).orElseThrow(MemoNotFoundException::new);
+
+        if (memo.getUser() != user) {
+            throw new UserNotFoundException("본인 메모가 아닙니다.");
+        }
+        // 메모태그 레코드 다 지우고
+        tagMemoRepository.deleteMemo(memo);
+
+    }
 }

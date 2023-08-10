@@ -26,6 +26,26 @@ public class MemoController {
     private final MemoService memoService;
     private final WebService webService;
 
+    @DeleteMapping
+    public ResponseEntity<String> deleteMemo(@RequestBody String keyword, HttpServletRequest request) {
+        JsonObject jsonObject = new JsonObject();
+        Long id = webService.getIdInHeader(request);
+
+        try {
+            String key = webService.jsonToString(keyword, "keyword");
+            memoService.removeMemo(id, key);
+        } catch (MemoNotFoundException e) {
+            log.info("해당 메모가 없음");
+            jsonObject.addProperty("response", Response.NOT_FOUND);
+            return webService.badResponse(jsonObject);
+        } catch (UserNotFoundException e) {
+            log.info("본인 메모가 아님");
+            jsonObject.addProperty("response", Response.BAD);
+            return webService.badResponse(jsonObject);
+        }
+
+        return webService.okResponse(jsonObject);
+    }
     @PatchMapping
     public ResponseEntity<String> changeKeyword(@RequestBody @Valid KeywordDto keywordDto, HttpServletRequest request) {
         /**

@@ -91,4 +91,13 @@ public class CustomTagMemoRepository {
                 );
 
     }
+
+    public void deleteMemo(Memo memo) {
+        memo = em.merge(memo);
+
+        query.delete(tagMemo)
+                .where(tagMemo.memo.eq(memo));
+
+        em.remove(memo);
+    }
 }

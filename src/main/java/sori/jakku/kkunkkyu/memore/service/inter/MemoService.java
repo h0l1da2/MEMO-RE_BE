@@ -11,4 +11,5 @@ public interface MemoService {
     void write(Long id, MemoWriteDto memoWriteDto) throws DuplicateMemoException;
     void changeKeyword(Long id, KeywordDto keywordDto) throws MemoNotFoundException, UserNotFoundException;
     void changeContentTag(Long id, ConTagUpdateDto conTagUpdateDto) throws MemoNotFoundException, UserNotFoundException;
+    void removeMemo(Long id, String keyword) throws MemoNotFoundException, UserNotFoundException;
 }
