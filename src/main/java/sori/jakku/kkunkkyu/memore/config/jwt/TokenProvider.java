@@ -27,8 +27,8 @@ public class TokenProvider {
         key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String createToken(String username) {
-        Claims claims = getClaims(username);
+    public String createToken(Long id) {
+        Claims claims = getClaims(id);
 
         return Jwts.builder()
                 .setHeaderParam("typ", "Bearer")
@@ -37,7 +37,7 @@ public class TokenProvider {
                 .compact();
     }
 
-    private Claims getClaims(String username) {
+    private Claims getClaims(Long id) {
         Date now = new Date();
 
         Claims claims = Jwts.claims()
@@ -45,7 +45,7 @@ public class TokenProvider {
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + tokenValidTime));
 
-        claims.put("username", username);
+        claims.put("id", id.toString());
         claims.put("role", "[ROLE_USER]");
         return claims;
     }

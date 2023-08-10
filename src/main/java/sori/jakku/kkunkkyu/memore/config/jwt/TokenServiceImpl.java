@@ -13,15 +13,15 @@ public class TokenServiceImpl implements TokenService {
     private final TokenParser tokenParser;
 
     @Override
-    public String creatToken(String username) {
+    public String creatToken(Long id) {
         // 토큰 생성 Provider
-        return tokenProvider.createToken(username);
+        return tokenProvider.createToken(id);
     }
 
     @Override
     public String reCreateToken(String token) {
-        String username = tokenParser.getUsername(token);
-        return tokenProvider.createToken(username);
+        String id = tokenParser.getId(token);
+        return tokenProvider.createToken(Long.parseLong(id));
     }
 
     @Override
@@ -31,7 +31,7 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public String usernameByToken(String token) {
-        return tokenParser.getUsername(token);
+        return tokenParser.getId(token);
     }
 
 
