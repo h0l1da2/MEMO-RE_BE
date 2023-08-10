@@ -24,7 +24,7 @@ public class TagController {
     public ResponseEntity<String> write(@RequestBody String name, HttpServletRequest request) {
 
         JsonObject jsonObject = new JsonObject();
-        Long id = webService.getIdInSession(request);
+        Long id = webService.getIdInHeader(request);
 
         try {
 

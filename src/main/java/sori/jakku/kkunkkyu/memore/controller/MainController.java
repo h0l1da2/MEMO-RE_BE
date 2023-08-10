@@ -35,8 +35,7 @@ public class MainController {
          * 3 개의 태그가 올바른 양식을 가졌는지 확인
          * 태그 값을 응답에 추가 (그래야 본인 페이지로 갔을 때, 그 값들을 보여줄 수 있을듯)
          */
-        // 필요 없는 작업인가?
-        Long id = webService.getIdInSession(request);
+        Long id = webService.getIdInHeader(request);
 
         try {
 
@@ -45,7 +44,7 @@ public class MainController {
 
         } catch (UserNotFoundException e) {
 
-            log.error("세션에 들어있는 id 가 진짜 id 가 아니었다 Id = {}", id);
+            log.error("헤더에 들어있는 id 가 진짜 id 가 아니었다 Id = {}", id);
             jsonObject.addProperty("response", "USER_NOT_FOUND");
             return webService.badResponse(jsonObject);
 

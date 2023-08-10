@@ -30,9 +30,14 @@ public class TokenParser {
         return false;
     }
 
-    public String getId(String token) {
+    public Long getId(String token) {
         Claims claims = getClaims(token);
-        return claims.get("id", String.class);
+        return Long.parseLong(claims.get("id", String.class));
+    }
+
+    public String getUsername(String token) {
+        Claims claims = getClaims(token);
+        return claims.get("username", String.class);
     }
 
     private Claims getClaims(String token) {

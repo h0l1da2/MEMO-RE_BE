@@ -48,7 +48,7 @@ public class UserLoginController {
             User user = userService.login(userDto);
 
             // 토큰 생성
-            String token = tokenService.creatToken(user.getId());
+            String token = tokenService.creatToken(user.getId(), user.getUsername());
             jsonObject.addProperty("token", token);
 
         } catch (LoginException e) {
