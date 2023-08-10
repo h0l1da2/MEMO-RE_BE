@@ -9,5 +9,5 @@ public interface WebService {
     ResponseEntity<String> badResponse(JsonObject jsonObject);
     String jsonToString(String json, String value);
     String objectToJson(Object obj);
-    Long getIdInSession(HttpServletRequest request);
+    Long getIdInHeader(HttpServletRequest request);
 }

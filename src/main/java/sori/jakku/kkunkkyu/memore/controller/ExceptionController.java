@@ -29,12 +29,21 @@ public class ExceptionController {
 
         JsonObject jsonObject = new JsonObject();
 
-        for (FieldError erros : e.getFieldErrors()) {
-            if (erros.getField().equals("username")) {
+        for (FieldError error : e.getFieldErrors()) {
+            if (error.getField().equals("username")) {
                 jsonObject.addProperty("response", Response.BAD_USERNAME);
             }
-            if (erros.getField().equals("password")) {
+            if (error.getField().equals("password")) {
                 jsonObject.addProperty("response", Response.BAD_PWD);
+            }
+            if (error.getField().equals("keyword")) {
+                jsonObject.addProperty("response", Response.BAD);
+            }
+            if (error.getField().equals("content")) {
+                jsonObject.addProperty("response", Response.BAD);
+            }
+            if (error.getField().equals("tag") && e.getMessage().contains("size")) {
+                jsonObject.addProperty("response", Response.SIZE);
             }
         }
 

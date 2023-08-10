@@ -4,20 +4,24 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import sori.jakku.kkunkkyu.memore.config.jwt.TokenService;
+import sori.jakku.kkunkkyu.memore.domain.dto.Response;
 import sori.jakku.kkunkkyu.memore.service.inter.WebService;
 
 @Service
 @RequiredArgsConstructor
 public class WebServiceImpl implements WebService {
 
+    private final TokenService tokenService;
+
     @Override
     public ResponseEntity<String> okResponse(JsonObject jsonObject) {
         Gson gson = new Gson();
-        jsonObject.addProperty("response", "OK");
+        jsonObject.addProperty("response", Response.OK);
         String json = gson.toJson(jsonObject);
         return ResponseEntity.ok()
                 .body(json);
@@ -44,8 +48,8 @@ public class WebServiceImpl implements WebService {
     }
 
     @Override
-    public Long getIdInSession(HttpServletRequest request) {
-        HttpSession session = request.getSession(false);
-        return (Long) session.getAttribute("id");
+    public Long getIdInHeader(HttpServletRequest request) {
+        String token = request.getHeader(HttpHeaders.AUTHORIZATION);
+        return tokenService.getIdByToken(token);
     }
 }

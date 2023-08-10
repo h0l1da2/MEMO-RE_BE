@@ -10,5 +10,7 @@ public class Response {
     public static final String USERNAME_DUPL = "USERNAME_DUPL";
     public static final String BAD_USERNAME = "BAD_USERNAME";
     public static final String BAD_PWD = "BAD_PWD";
-
+    public static final String DUPLICATE = "DUPLICATE";
+    public static final String BAD = "BAD";
+    public static final String SIZE = "BAD_SIZE";
 }
