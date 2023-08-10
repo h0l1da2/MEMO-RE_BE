@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import sori.jakku.kkunkkyu.memore.domain.dto.Response;
 import sori.jakku.kkunkkyu.memore.domain.dto.TagDto;
 import sori.jakku.kkunkkyu.memore.exception.ConditionNotMatchException;
 import sori.jakku.kkunkkyu.memore.exception.UserNotFoundException;
@@ -45,13 +46,13 @@ public class MainController {
         } catch (UserNotFoundException e) {
 
             log.error("헤더에 들어있는 id 가 진짜 id 가 아니었다 Id = {}", id);
-            jsonObject.addProperty("response", "USER_NOT_FOUND");
+            jsonObject.addProperty("response", Response.USER_NOT_FOUND);
             return webService.badResponse(jsonObject);
 
         } catch (ConditionNotMatchException e) {
 
             log.error("태그 길이 문제가 있음");
-            jsonObject.addProperty("response", "TAG_NOT_VALID");
+            jsonObject.addProperty("response", Response.TAG_NOT_VALID);
             return webService.badResponse(jsonObject);
 
         }

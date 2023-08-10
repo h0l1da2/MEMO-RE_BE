@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import sori.jakku.kkunkkyu.memore.domain.dto.Response;
 import sori.jakku.kkunkkyu.memore.service.inter.WebService;
 
 @Slf4j
@@ -30,10 +31,10 @@ public class ExceptionController {
 
         for (FieldError erros : e.getFieldErrors()) {
             if (erros.getField().equals("username")) {
-                jsonObject.addProperty("response", "BAD_USERNAME");
+                jsonObject.addProperty("response", Response.BAD_USERNAME);
             }
             if (erros.getField().equals("password")) {
-                jsonObject.addProperty("response", "BAD_PWD");
+                jsonObject.addProperty("response", Response.BAD_PWD);
             }
         }
 

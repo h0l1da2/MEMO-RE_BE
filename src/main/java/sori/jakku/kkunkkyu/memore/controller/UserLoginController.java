@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import sori.jakku.kkunkkyu.memore.config.jwt.TokenService;
 import sori.jakku.kkunkkyu.memore.domain.User;
+import sori.jakku.kkunkkyu.memore.domain.dto.Response;
 import sori.jakku.kkunkkyu.memore.domain.dto.UserDto;
 import sori.jakku.kkunkkyu.memore.service.inter.UserService;
 import sori.jakku.kkunkkyu.memore.service.inter.WebService;
@@ -52,7 +53,7 @@ public class UserLoginController {
             jsonObject.addProperty("token", token);
 
         } catch (LoginException e) {
-            jsonObject.addProperty("response", "LOGIN_FAIL");
+            jsonObject.addProperty("response", Response.LOGIN_FAIL);
             return webService.badResponse(jsonObject);
         }
 

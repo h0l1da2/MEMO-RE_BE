@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import sori.jakku.kkunkkyu.memore.config.jwt.TokenService;
+import sori.jakku.kkunkkyu.memore.domain.dto.Response;
 import sori.jakku.kkunkkyu.memore.service.inter.WebService;
 
 @Slf4j
@@ -29,7 +30,7 @@ public class TestController {
 
         String header = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (header == null) {
-            jsonObject.addProperty("response", "FAILED");
+            jsonObject.addProperty("response", Response.FAILED);
             return webService.badResponse(jsonObject);
         }
         header = header.substring("Bearer ".length());

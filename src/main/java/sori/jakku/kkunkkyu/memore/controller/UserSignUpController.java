@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import sori.jakku.kkunkkyu.memore.domain.dto.Response;
 import sori.jakku.kkunkkyu.memore.domain.dto.UserDto;
 import sori.jakku.kkunkkyu.memore.exception.UsernameDuplException;
 import sori.jakku.kkunkkyu.memore.service.inter.UserService;
@@ -34,7 +35,7 @@ public class UserSignUpController {
         try {
             valid = userService.usernameDupl(username);
         } catch (UsernameDuplException e) {
-            jsonObject.addProperty("response", "USERNAME_DUPL");
+            jsonObject.addProperty("response", Response.USERNAME_DUPL);
             return webService.badResponse(jsonObject);
         }
         return validResponse(valid);
@@ -49,7 +50,7 @@ public class UserSignUpController {
 
         } catch (UsernameDuplException e) {
 
-            jsonObject.addProperty("response", "USERNAME_DUPL");
+            jsonObject.addProperty("response", Response.USERNAME_DUPL);
             return webService.badResponse(jsonObject);
 
         }
@@ -60,7 +61,7 @@ public class UserSignUpController {
     private ResponseEntity<String> validResponse(boolean valid) {
         JsonObject jsonObject = new JsonObject();
         if (!valid) {
-            jsonObject.addProperty("response", "NOT_VALID");
+            jsonObject.addProperty("response", Response.NOT_VALID);
             return webService.badResponse(jsonObject);
         }
         return webService.okResponse(jsonObject);
