@@ -12,7 +12,7 @@ POST http://localhost:8080/login
 Content-Type: application/json
 
 {
-  "username": "aaaa12",
+  "username": "aaaa12344",
   "password": "a12345"
 }
 
@@ -23,4 +23,21 @@ Content-Type: application/json
 {
   "username": "aaaa12",
   "password": "a1234544"
+}
+### Login Filed (username NotValid)
+POST http://localhost:8080/login
+Content-Type: application/json
+
+{
+  "username": "a",
+  "password": "a12345"
+}
+
+### Login Failed (password NotValid)
+POST http://localhost:8080/login
+Content-Type: application/json
+
+{
+  "username": "aaaa12",
+  "password": "123"
 }
