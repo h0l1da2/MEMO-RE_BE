@@ -1,5 +1,6 @@
 package sori.jakku.kkunkkyu.memore.repository;
 
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -43,21 +44,24 @@ public class CustomTagMemoRepository {
          * 태그 없으면 추가, 불러오기
          * 태그 메모 연결 테이블에 + 메모 후 DB 추가
          */
-
-        // 태그 추가, 불러오기
-        List<Tag> list = new ArrayList<>();
-        for (String name : memoWriteDto.getTag()) {
-            list.add(tagRepository.findByName(name).orElse(
-                    tagRepository.save(new Tag(user, name)))
-            );
-        }
-
-        // 메모 추가 후, 태그 메모 테이블에 추가
         Memo memo = new Memo(memoWriteDto.getKeyword(), memoWriteDto.getContent(), user);
-        em.persist(memo);
-        for (Tag tag : list) {
-            TagMemo tagMemo = new TagMemo(memo, tag);
-            em.persist(tagMemo);
+
+        // 태그가 있을 경우, 태그 추가 및 불러오기
+        if (memoWriteDto.getTag() != null) {
+            List<Tag> list = new ArrayList<>();
+            for (String name : memoWriteDto.getTag()) {
+                list.add(tagRepository.findByName(name).orElse(
+                        tagRepository.save(new Tag(user, name)))
+                );
+            }
+            // 메모 추가 후, 태그 메모 테이블에 추가
+            em.persist(memo);
+            for (Tag tag : list) {
+                TagMemo tagMemo = new TagMemo(memo, tag);
+                em.persist(tagMemo);
+            }
+        } else {
+            em.persist(memo);
         }
 
         em.close();
@@ -99,5 +103,17 @@ public class CustomTagMemoRepository {
                 .where(tagMemo.memo.eq(memo));
 
         em.remove(memo);
+    }
+
+    public void deleteAllTagMemo() {
+        query.delete(tagMemo);
+    }
+
+    public List<TagMemo> findAllTagMemoByMemo(Memo memo) {
+        return query.select(tagMemo)
+                .from(tagMemo)
+                .where(tagMemo.memo.eq(memo))
+                .fetch();
+
     }
 }
