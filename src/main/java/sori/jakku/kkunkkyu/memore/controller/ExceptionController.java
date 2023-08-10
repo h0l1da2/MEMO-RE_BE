@@ -39,9 +39,6 @@ public class ExceptionController {
             if (error.getField().equals("keyword")) {
                 jsonObject.addProperty("response", Response.BAD);
             }
-            if (error.getField().equals("content")) {
-                jsonObject.addProperty("response", Response.BAD);
-            }
             if (error.getField().equals("tag") && e.getMessage().contains("size")) {
                 jsonObject.addProperty("response", Response.SIZE);
             }
