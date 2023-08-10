@@ -34,7 +34,6 @@ public class MemoController {
             return webService.badResponse(jsonObject);
         }
 
-        jsonObject.addProperty("response", Response.OK);
         return webService.okResponse(jsonObject);
     }
 
