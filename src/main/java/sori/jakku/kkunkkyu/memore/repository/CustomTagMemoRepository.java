@@ -1,19 +1,21 @@
 package sori.jakku.kkunkkyu.memore.repository;
 
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import sori.jakku.kkunkkyu.memore.domain.Memo;
-import sori.jakku.kkunkkyu.memore.domain.Tag;
-import sori.jakku.kkunkkyu.memore.domain.TagMemo;
-import sori.jakku.kkunkkyu.memore.domain.User;
+import sori.jakku.kkunkkyu.memore.domain.*;
+import sori.jakku.kkunkkyu.memore.domain.dto.ConTagUpdateDto;
 import sori.jakku.kkunkkyu.memore.domain.dto.MemoWriteDto;
 import sori.jakku.kkunkkyu.memore.domain.dto.TagDto;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static sori.jakku.kkunkkyu.memore.domain.QTag.*;
+import static sori.jakku.kkunkkyu.memore.domain.QTagMemo.*;
 
 @Slf4j
 @Repository
@@ -22,6 +24,7 @@ public class CustomTagMemoRepository {
 
     private final TagRepository tagRepository;
     private final EntityManager em;
+    private final JPAQueryFactory query;
 
     @Transactional
     public TagDto saveTagMain(User user, TagDto tagDto) {
@@ -58,6 +61,34 @@ public class CustomTagMemoRepository {
         }
 
         em.close();
+
+    }
+
+    @Transactional
+    public void updateMemoAndTag(Memo memo, ConTagUpdateDto conTagUpdateDto) {
+        /**
+         * 컨텐츠바꾸고
+         * 태그메모테이블에서 해당 태그가 달린 레코드 삭제
+         */
+
+        Memo findMemo = em.merge(memo);
+        findMemo.changeContent(conTagUpdateDto.getContent());
+
+        conTagUpdateDto.getTag().forEach((key, value) -> {
+                    if (value == false) {
+                        Tag removeTag = query.select(tag)
+                                .from(tag)
+                                .where(tag.name.eq(key))
+                                .fetchFirst();
+
+                        query.delete(tagMemo)
+                                .where(tagMemo.memo.eq(findMemo).and(
+                                        tagMemo.tag.eq(removeTag)
+                                ));
+
+                    }
+                }
+                );
 
     }
 }

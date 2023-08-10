@@ -13,4 +13,5 @@ public class Response {
     public static final String DUPLICATE = "DUPLICATE";
     public static final String BAD = "BAD";
     public static final String SIZE = "BAD_SIZE";
+    public static final String NOT_FOUND = "NOT_FOUND";
 }

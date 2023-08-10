@@ -22,4 +22,12 @@ public class Memo {
         this.content = content;
         this.user = user;
     }
+
+    public void changeKeyword(String keyword) {
+        this.keyword = keyword;
+    }
+
+    public void changeContent(String content) {
+        this.content = content;
+    }
 }

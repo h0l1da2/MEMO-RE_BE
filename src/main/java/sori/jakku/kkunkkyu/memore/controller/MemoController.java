@@ -7,9 +7,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import sori.jakku.kkunkkyu.memore.domain.dto.ConTagUpdateDto;
+import sori.jakku.kkunkkyu.memore.domain.dto.KeywordDto;
 import sori.jakku.kkunkkyu.memore.domain.dto.MemoWriteDto;
 import sori.jakku.kkunkkyu.memore.domain.dto.Response;
 import sori.jakku.kkunkkyu.memore.exception.DuplicateMemoException;
+import sori.jakku.kkunkkyu.memore.exception.MemoNotFoundException;
+import sori.jakku.kkunkkyu.memore.exception.UserNotFoundException;
 import sori.jakku.kkunkkyu.memore.service.inter.MemoService;
 import sori.jakku.kkunkkyu.memore.service.inter.WebService;
 
@@ -22,6 +26,53 @@ public class MemoController {
     private final MemoService memoService;
     private final WebService webService;
 
+    @PatchMapping
+    public ResponseEntity<String> changeKeyword(@RequestBody @Valid KeywordDto keywordDto, HttpServletRequest request) {
+        /**
+         * 원래 키워드 있는지 확인 후 있으면 업데이트
+         */
+        JsonObject jsonObject = new JsonObject();
+        Long id = webService.getIdInHeader(request);
+
+        try {
+            memoService.changeKeyword(id, keywordDto);
+        } catch (MemoNotFoundException e) {
+            log.info("해당 메모가 없음");
+            jsonObject.addProperty("response", Response.NOT_FOUND);
+            return webService.badResponse(jsonObject);
+        } catch (UserNotFoundException e) {
+            log.info("본인 메모가 아님");
+            jsonObject.addProperty("response", Response.BAD);
+            return webService.badResponse(jsonObject);
+        }
+
+        return webService.okResponse(jsonObject);
+    }
+    @PutMapping
+    public ResponseEntity<String> changeContentTag(@RequestBody @Valid ConTagUpdateDto conTagUpdateDto, HttpServletRequest request) {
+        /**
+         * 원래 키워드 확인 후,
+         * 있다면 전부 수정
+         * 태그테이블도 삭제
+         */
+        JsonObject jsonObject = new JsonObject();
+        Long id = webService.getIdInHeader(request);
+
+        try {
+            memoService.changeContentTag(id, conTagUpdateDto);
+        } catch (MemoNotFoundException e) {
+            log.info("중복 키워드");
+            jsonObject.addProperty("response", Response.DUPLICATE);
+            return webService.badResponse(jsonObject);
+        } catch (UserNotFoundException e) {
+            log.info("본인 메모가 아님");
+            jsonObject.addProperty("response", Response.BAD);
+            return webService.badResponse(jsonObject);
+        }
+
+        return webService.okResponse(jsonObject);
+    }
+
     @PostMapping
     public ResponseEntity<String> write(@RequestBody @Valid MemoWriteDto memoWriteDto, HttpServletRequest request) {
         JsonObject jsonObject = new JsonObject();
@@ -30,6 +81,7 @@ public class MemoController {
         try {
             memoService.write(id, memoWriteDto);
         } catch (DuplicateMemoException e) {
+            log.info("키워드가 같음");
             jsonObject.addProperty("response", Response.DUPLICATE);
             return webService.badResponse(jsonObject);
         }
