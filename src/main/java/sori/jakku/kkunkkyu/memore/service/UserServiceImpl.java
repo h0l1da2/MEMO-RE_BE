@@ -7,9 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import sori.jakku.kkunkkyu.memore.domain.User;
 import sori.jakku.kkunkkyu.memore.domain.dto.UserDto;
-import sori.jakku.kkunkkyu.memore.exception.PasswordNotValidException;
 import sori.jakku.kkunkkyu.memore.exception.UsernameDuplException;
-import sori.jakku.kkunkkyu.memore.exception.UsernameNotValidException;
 import sori.jakku.kkunkkyu.memore.repository.UserRepository;
 import sori.jakku.kkunkkyu.memore.service.inter.UserService;
 import sori.jakku.kkunkkyu.memore.service.inter.WebService;
@@ -50,32 +48,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean pwdCheck(String password) {
-        try {
-            password = webService.jsonToString(password, "password");
-        } catch (NullPointerException e) {
-            log.info("password is Null");
-            return false;
-        }
-
-        if (!pwdValid(password)) return false;
-
-        return true;
-    }
-
-    @Override
-    public UserDto signUp(UserDto userDto) throws UsernameNotValidException, PasswordNotValidException, UsernameDuplException {
-        /**
-         * 아이디, 패스워드 valid 확인 후 저장
-         */
-
-        if (!usernameValid(userDto.getUsername())) {
-            throw new UsernameNotValidException();
-        }
-
-        if (!pwdValid(userDto.getPassword())) {
-            throw new PasswordNotValidException();
-        }
+    public UserDto signUp(UserDto userDto) throws UsernameDuplException {
 
         User findUser = userRepository.findByUsername(userDto.getUsername());
         if (findUser != null) {
@@ -136,26 +109,4 @@ public class UserServiceImpl implements UserService {
         return true;
     }
 
-    private boolean pwdValid(String password) throws NullPointerException {
-        /**
-         * 패스워드
-         * - 6자 이상 ~ 15자 이하
-         * - 공백 불허용
-         * - 대소문자, 숫자
-         */
-        if (!StringUtils.hasText(password)) {
-            return false;
-        }
-
-        if (password.length() < 6 || password.length() > 15) {
-            return false;
-        }
-
-        for (char c : password.toCharArray()) {
-            if (!Character.isLetterOrDigit(c)) {
-                return false;
-            }
-        }
-        return true;
-    }
 }
