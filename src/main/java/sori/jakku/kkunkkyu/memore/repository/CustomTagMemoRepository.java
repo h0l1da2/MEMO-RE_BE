@@ -151,6 +151,20 @@ public class CustomTagMemoRepository {
 
         User user = em.find(User.class, id);
 
+        if (tagName == null) {
+            return query.select(Projections.constructor(MemoListDto.class,
+                            memo.keyword,
+                            memo.content))
+                    .from(memo)
+                    .leftJoin(tagMemo).on(memo.id.eq(tagMemo.memo.id))
+                    .leftJoin(tagMemo.tag, tag)
+                    .where(memo.user.eq(user), tag.user.eq(user), tagMemo.memo.in(memo), tag.name.eq((String) null))
+                    .orderBy(memo.id.desc())
+                    .offset(pageable.getOffset())
+                    .limit(pageable.getPageSize())
+                    .fetch();
+        }
+
         return query.select(Projections.constructor(MemoListDto.class,
                 memo.keyword,
                 memo.content,
@@ -162,7 +176,7 @@ public class CustomTagMemoRepository {
                 .from(memo)
                 .leftJoin(tagMemo).on(memo.id.eq(tagMemo.memo.id))
                 .leftJoin(tagMemo.tag, tag)
-                .where(memo.user.eq(user), tag.user.eq(user), tagMemo.memo.in(memo))
+                .where(memo.user.eq(user), tag.user.eq(user), tagMemo.memo.in(memo), tag.name.eq(tagName))
                 .orderBy(memo.id.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
