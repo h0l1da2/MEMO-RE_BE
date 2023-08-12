@@ -11,7 +11,7 @@ import sori.jakku.kkunkkyu.memore.domain.Memo;
 import sori.jakku.kkunkkyu.memore.domain.Tag;
 import sori.jakku.kkunkkyu.memore.domain.TagMemo;
 import sori.jakku.kkunkkyu.memore.domain.User;
-import sori.jakku.kkunkkyu.memore.domain.dto.ConTagUpdateDto;
+import sori.jakku.kkunkkyu.memore.domain.dto.MemoUpdateDto;
 import sori.jakku.kkunkkyu.memore.domain.dto.MemoWriteDto;
 import sori.jakku.kkunkkyu.memore.exception.DuplicateMemoException;
 import sori.jakku.kkunkkyu.memore.exception.MemoNotFoundException;
@@ -186,16 +186,16 @@ class MemoServiceImplTest {
         MemoWriteDto memoWriteDto = new MemoWriteDto("keyword", "content", list);
         memoService.write(newUser.getId(), memoWriteDto);
 
-        ConTagUpdateDto conTagUpdateDto = new ConTagUpdateDto();
-        conTagUpdateDto.setOriginKey("keyword");
-        conTagUpdateDto.setNewKey("newKey");
-        conTagUpdateDto.setContent("newCont");
+        MemoUpdateDto memoUpdateDto = new MemoUpdateDto();
+        memoUpdateDto.setOriginKey("keyword");
+        memoUpdateDto.setNewKey("newKey");
+        memoUpdateDto.setContent("newCont");
         Map<String, Boolean> map = new HashMap();
         map.put("tag2", true);
         map.put("tag1", false);
-        conTagUpdateDto.setTag(map);
+        memoUpdateDto.setTag(map);
 
-        memoService.changeContentTag(newUser.getId(), conTagUpdateDto);
+        memoService.changeContentTag(newUser.getId(), memoUpdateDto);
 
         Memo memo = memoRepository.findByKeyword("newKey").orElse(null);
         Tag tag1 = tagRepository.findByName("tag1").orElse(null);
@@ -221,15 +221,15 @@ class MemoServiceImplTest {
         MemoWriteDto memoWriteDto = new MemoWriteDto("keyword", "content", list);
         memoService.write(newUser.getId(), memoWriteDto);
 
-        ConTagUpdateDto conTagUpdateDto = new ConTagUpdateDto();
-        conTagUpdateDto.setOriginKey("keyword");
-        conTagUpdateDto.setNewKey("newKey");
-        conTagUpdateDto.setContent("newCont");
+        MemoUpdateDto memoUpdateDto = new MemoUpdateDto();
+        memoUpdateDto.setOriginKey("keyword");
+        memoUpdateDto.setNewKey("newKey");
+        memoUpdateDto.setContent("newCont");
         Map<String, Boolean> map = new HashMap();
         map.put("tag1", false);
-        conTagUpdateDto.setTag(map);
+        memoUpdateDto.setTag(map);
 
-        memoService.changeContentTag(newUser.getId(), conTagUpdateDto);
+        memoService.changeContentTag(newUser.getId(), memoUpdateDto);
 
         Memo memo = memoRepository.findByKeyword("newKey").orElse(null);
         Tag tag1 = tagRepository.findByName("tag1").orElse(null);
@@ -253,17 +253,17 @@ class MemoServiceImplTest {
         MemoWriteDto memoWriteDto = new MemoWriteDto("keyword", "content", list);
         memoService.write(newUser.getId(), memoWriteDto);
 
-        ConTagUpdateDto conTagUpdateDto = new ConTagUpdateDto();
-        conTagUpdateDto.setOriginKey("no_keyword");
-        conTagUpdateDto.setNewKey("newKey");
-        conTagUpdateDto.setContent("newCont");
+        MemoUpdateDto memoUpdateDto = new MemoUpdateDto();
+        memoUpdateDto.setOriginKey("no_keyword");
+        memoUpdateDto.setNewKey("newKey");
+        memoUpdateDto.setContent("newCont");
         Map<String, Boolean> map = new HashMap();
         map.put("tag2", true);
         map.put("tag1", false);
-        conTagUpdateDto.setTag(map);
+        memoUpdateDto.setTag(map);
 
         Assertions.assertThrows(MemoNotFoundException.class, () ->
-                memoService.changeContentTag(newUser.getId(), conTagUpdateDto));
+                memoService.changeContentTag(newUser.getId(), memoUpdateDto));
     }
 
     @Test
