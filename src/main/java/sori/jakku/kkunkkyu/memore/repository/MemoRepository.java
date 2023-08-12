@@ -8,7 +8,7 @@ import sori.jakku.kkunkkyu.memore.domain.User;
 import java.util.Optional;
 
 public interface MemoRepository extends JpaRepository<Memo, Long> {
-    @Query("select m from Memo m join fetch m.user where m.keyword = :keyword")
+    @Query("select m from Memo m where m.keyword = :keyword")
     Optional<Memo> findByKeyword(String keyword);
     Optional<Memo> findByKeywordAndUser(String keyword, User user);
 }

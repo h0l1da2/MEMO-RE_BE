@@ -1,9 +1,14 @@
 package sori.jakku.kkunkkyu.memore.repository;
 
+import com.querydsl.core.Tuple;
+import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import sori.jakku.kkunkkyu.memore.domain.*;
@@ -14,6 +19,8 @@ import sori.jakku.kkunkkyu.memore.domain.dto.TagDto;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.querydsl.jpa.JPAExpressions.select;
+import static sori.jakku.kkunkkyu.memore.domain.QMemo.*;
 import static sori.jakku.kkunkkyu.memore.domain.QTag.*;
 import static sori.jakku.kkunkkyu.memore.domain.QTagMemo.*;
 
@@ -138,5 +145,27 @@ public class CustomTagMemoRepository {
                 .where(tagMemo.memo.eq(memo))
                 .fetch();
 
+    }
+
+    public List<MemoListDto> findAllForList(Long id, Pageable pageable, String tagName) {
+
+        User user = em.find(User.class, id);
+
+        return query.select(Projections.constructor(MemoListDto.class,
+                memo.keyword,
+                memo.content,
+                Expressions.list(
+                        select(tag.name)
+                                .from(tag)
+                                .where(tag.name.in(tagName))
+                )))
+                .from(memo)
+                .leftJoin(tagMemo).on(memo.id.eq(tagMemo.memo.id))
+                .leftJoin(tagMemo.tag, tag)
+                .where(memo.user.eq(user), tag.user.eq(user), tagMemo.memo.in(memo))
+                .orderBy(memo.id.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
     }
 }

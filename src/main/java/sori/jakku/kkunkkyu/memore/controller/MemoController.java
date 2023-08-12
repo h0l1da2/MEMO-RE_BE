@@ -1,12 +1,17 @@
 package sori.jakku.kkunkkyu.memore.controller;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import sori.jakku.kkunkkyu.memore.domain.MemoListDto;
 import sori.jakku.kkunkkyu.memore.domain.dto.MemoUpdateDto;
 import sori.jakku.kkunkkyu.memore.domain.dto.MemoWriteDto;
 import sori.jakku.kkunkkyu.memore.domain.dto.Response;
@@ -16,6 +21,8 @@ import sori.jakku.kkunkkyu.memore.exception.UserNotFoundException;
 import sori.jakku.kkunkkyu.memore.service.inter.MemoService;
 import sori.jakku.kkunkkyu.memore.service.inter.WebService;
 
+import java.util.List;
+
 @Slf4j
 @RestController
 @RequestMapping("/memo")
@@ -24,6 +31,18 @@ public class MemoController {
 
     private final MemoService memoService;
     private final WebService webService;
+
+    @GetMapping
+    public ResponseEntity<String> list(@RequestParam String tag, @PageableDefault(size = 12) Pageable pageable, HttpServletRequest request) {
+
+        JsonObject jsonObject = new JsonObject();
+        Long id = webService.getIdInHeader(request);
+        List<MemoListDto> memoList = memoService.memoList(id, pageable, tag);
+
+        String memoListJson = webService.objectToJson(memoList);
+        jsonObject.addProperty("memoList", memoListJson);
+        return webService.okResponse(jsonObject);
+    }
 
     @DeleteMapping
     public ResponseEntity<String> deleteMemo(@RequestBody String keyword, HttpServletRequest request) {

@@ -2,8 +2,10 @@ package sori.jakku.kkunkkyu.memore.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import sori.jakku.kkunkkyu.memore.domain.Memo;
+import sori.jakku.kkunkkyu.memore.domain.MemoListDto;
 import sori.jakku.kkunkkyu.memore.domain.User;
 import sori.jakku.kkunkkyu.memore.domain.dto.MemoUpdateDto;
 import sori.jakku.kkunkkyu.memore.domain.dto.MemoWriteDto;
@@ -14,6 +16,8 @@ import sori.jakku.kkunkkyu.memore.repository.CustomTagMemoRepository;
 import sori.jakku.kkunkkyu.memore.repository.MemoRepository;
 import sori.jakku.kkunkkyu.memore.service.inter.MemoService;
 import sori.jakku.kkunkkyu.memore.service.inter.UserService;
+
+import java.util.List;
 
 @Slf4j
 @Service
@@ -68,5 +72,16 @@ public class MemoServiceImpl implements MemoService {
         // 메모태그 레코드 다 지우고
         tagMemoRepository.deleteMemo(memo);
 
+    }
+
+    @Override
+    public List<MemoListDto> memoList(Long id, Pageable pageable, String tag) {
+        /**
+         * 메모 가져오기
+         * 그 메모로 태그메모 싹 가져오기
+         * 태그메모로 태그 가져오기
+         */
+        // 페이지에 맞는 메모 다 가져오기
+        return tagMemoRepository.findAllForList(id, pageable, tag);
     }
 }
