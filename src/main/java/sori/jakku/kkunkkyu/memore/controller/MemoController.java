@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sori.jakku.kkunkkyu.memore.domain.dto.ConTagUpdateDto;
-import sori.jakku.kkunkkyu.memore.domain.dto.KeywordDto;
 import sori.jakku.kkunkkyu.memore.domain.dto.MemoWriteDto;
 import sori.jakku.kkunkkyu.memore.domain.dto.Response;
 import sori.jakku.kkunkkyu.memore.exception.DuplicateMemoException;
@@ -46,28 +45,7 @@ public class MemoController {
 
         return webService.okResponse(jsonObject);
     }
-    @PatchMapping
-    public ResponseEntity<String> changeKeyword(@RequestBody @Valid KeywordDto keywordDto, HttpServletRequest request) {
-        /**
-         * 원래 키워드 있는지 확인 후 있으면 업데이트
-         */
-        JsonObject jsonObject = new JsonObject();
-        Long id = webService.getIdInHeader(request);
 
-        try {
-            memoService.changeKeyword(id, keywordDto);
-        } catch (MemoNotFoundException e) {
-            log.info("해당 메모가 없음");
-            jsonObject.addProperty("response", Response.NOT_FOUND);
-            return webService.badResponse(jsonObject);
-        } catch (UserNotFoundException e) {
-            log.info("본인 메모가 아님");
-            jsonObject.addProperty("response", Response.BAD);
-            return webService.badResponse(jsonObject);
-        }
-
-        return webService.okResponse(jsonObject);
-    }
     @PutMapping
     public ResponseEntity<String> changeContentTag(@RequestBody @Valid ConTagUpdateDto conTagUpdateDto, HttpServletRequest request) {
         /**

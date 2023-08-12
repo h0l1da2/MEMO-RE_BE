@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import sori.jakku.kkunkkyu.memore.domain.Memo;
 import sori.jakku.kkunkkyu.memore.domain.User;
 import sori.jakku.kkunkkyu.memore.domain.dto.ConTagUpdateDto;
-import sori.jakku.kkunkkyu.memore.domain.dto.KeywordDto;
 import sori.jakku.kkunkkyu.memore.domain.dto.MemoWriteDto;
 import sori.jakku.kkunkkyu.memore.exception.DuplicateMemoException;
 import sori.jakku.kkunkkyu.memore.exception.MemoNotFoundException;
@@ -39,21 +38,6 @@ public class MemoServiceImpl implements MemoService {
         User user = userService.userById(id);
         // 태그 없으면 추가, 불러오기
         tagMemoRepository.saveTagAndMemo(user, memoWriteDto);
-
-    }
-
-    @Override
-    public void changeKeyword(Long id, KeywordDto keywordDto) throws MemoNotFoundException, UserNotFoundException {
-        User user = userService.userById(id);
-
-        Memo memo = memoRepository.findByKeyword(keywordDto.getOriginKey()).orElseThrow(MemoNotFoundException::new);
-
-        if (memo.getUser() != user) {
-            throw new UserNotFoundException("본인 메모가 아닙니다.");
-        }
-
-        memo.changeKeyword(keywordDto.getNewKey());
-        memoRepository.save(memo);
 
     }
 
