@@ -10,7 +10,9 @@ import java.util.Map;
 public class ConTagUpdateDto {
 
     @NotBlank @Size(min = 1, max = 20)
-    private String keyword;
+    private String originKey;
+    @NotBlank @Size(min = 1, max = 20)
+    private String newKey;
     private String content;
     private Map<String, Boolean> tag;
 

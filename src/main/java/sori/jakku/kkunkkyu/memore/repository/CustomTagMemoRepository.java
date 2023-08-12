@@ -76,10 +76,11 @@ public class CustomTagMemoRepository {
          */
 
         Memo findMemo = em.merge(memo);
-        findMemo.changeContent(conTagUpdateDto.getContent());
+        findMemo.changeMemo(conTagUpdateDto.getNewKey(), conTagUpdateDto.getContent());
 
         conTagUpdateDto.getTag().forEach((key, value) -> {
                     if (value == false) {
+
                         Tag removeTag = query.select(tag)
                                 .from(tag)
                                 .where(tag.name.eq(key))
@@ -88,8 +89,16 @@ public class CustomTagMemoRepository {
                         query.delete(tagMemo)
                                 .where(tagMemo.memo.eq(findMemo).and(
                                         tagMemo.tag.eq(removeTag)
-                                ));
+                                )).execute();
 
+                    }
+                    // 태그가 이미 있는 거면 놔두고, 없으면 태그메모테이블과 태그에 새로 추가
+                    if (value == true) {
+                        Tag findTag = tagRepository.findByName(key).orElse(null);
+                        if (findTag == null) {
+                            Tag newTag = tagRepository.save(new Tag(memo.getUser(), key));
+                            em.persist(new TagMemo(memo, newTag));
+                        }
                     }
                 }
                 );
@@ -100,13 +109,20 @@ public class CustomTagMemoRepository {
         memo = em.merge(memo);
 
         query.delete(tagMemo)
-                .where(tagMemo.memo.eq(memo));
+                .where(tagMemo.memo.eq(memo))
+                .execute();
 
         em.remove(memo);
     }
 
     public void deleteAllTagMemo() {
         query.delete(tagMemo);
+    }
+
+    public List<TagMemo> findAllTagMemo() {
+        return query.select(tagMemo)
+                .from(tagMemo)
+                .fetch();
     }
 
     public List<TagMemo> findAllTagMemoByMemo(Memo memo) {

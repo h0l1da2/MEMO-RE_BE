@@ -45,7 +45,7 @@ public class MemoServiceImpl implements MemoService {
     public void changeContentTag(Long id, ConTagUpdateDto conTagUpdateDto) throws MemoNotFoundException, UserNotFoundException {
         User user = userService.userById(id);
 
-        Memo memo = memoRepository.findByKeyword(conTagUpdateDto.getKeyword()).orElseThrow(MemoNotFoundException::new);
+        Memo memo = memoRepository.findByKeyword(conTagUpdateDto.getOriginKey()).orElseThrow(MemoNotFoundException::new);
 
         if (memo.getUser() != user) {
             throw new UserNotFoundException("본인 메모가 아닙니다.");

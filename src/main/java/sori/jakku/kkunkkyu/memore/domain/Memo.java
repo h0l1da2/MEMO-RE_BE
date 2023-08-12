@@ -23,11 +23,8 @@ public class Memo {
         this.user = user;
     }
 
-    public void changeKeyword(String keyword) {
+    public void changeMemo(String keyword, String content) {
         this.keyword = keyword;
-    }
-
-    public void changeContent(String content) {
         this.content = content;
     }
 }
