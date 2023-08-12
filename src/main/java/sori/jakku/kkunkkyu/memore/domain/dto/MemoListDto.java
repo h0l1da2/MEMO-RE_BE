@@ -1,4 +1,4 @@
-package sori.jakku.kkunkkyu.memore.domain;
+package sori.jakku.kkunkkyu.memore.domain.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,4 +13,5 @@ public class MemoListDto {
     private String keyword;
     private String content;
     private List<String> tag;
+
 }

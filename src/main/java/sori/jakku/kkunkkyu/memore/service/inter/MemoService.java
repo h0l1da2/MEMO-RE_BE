@@ -1,7 +1,7 @@
 package sori.jakku.kkunkkyu.memore.service.inter;
 
 import org.springframework.data.domain.Pageable;
-import sori.jakku.kkunkkyu.memore.domain.MemoListDto;
+import sori.jakku.kkunkkyu.memore.domain.dto.MemoListDto;
 import sori.jakku.kkunkkyu.memore.domain.dto.MemoUpdateDto;
 import sori.jakku.kkunkkyu.memore.domain.dto.MemoWriteDto;
 import sori.jakku.kkunkkyu.memore.exception.DuplicateMemoException;

@@ -1,17 +1,14 @@
 package sori.jakku.kkunkkyu.memore.repository;
 
-import com.querydsl.core.Tuple;
-import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import sori.jakku.kkunkkyu.memore.domain.*;
+import sori.jakku.kkunkkyu.memore.domain.dto.MemoListDto;
 import sori.jakku.kkunkkyu.memore.domain.dto.MemoUpdateDto;
 import sori.jakku.kkunkkyu.memore.domain.dto.MemoWriteDto;
 import sori.jakku.kkunkkyu.memore.domain.dto.TagDto;
@@ -19,10 +16,8 @@ import sori.jakku.kkunkkyu.memore.domain.dto.TagDto;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.querydsl.jpa.JPAExpressions.select;
 import static sori.jakku.kkunkkyu.memore.domain.QMemo.*;
 import static sori.jakku.kkunkkyu.memore.domain.QTag.*;
-import static sori.jakku.kkunkkyu.memore.domain.QTagMemo.*;
 
 @Slf4j
 @Repository
@@ -51,32 +46,14 @@ public class CustomTagMemoRepository {
          * 태그 메모 연결 테이블에 + 메모 후 DB 추가
          */
         Memo memo = new Memo(memoWriteDto.getKeyword(), memoWriteDto.getContent(), user);
-
+        em.persist(memo);
         // 태그가 있을 경우, 태그 추가 및 불러오기
         if (memoWriteDto.getTag() != null) {
-            List<Tag> list = new ArrayList<>();
             for (String name : memoWriteDto.getTag()) {
-                Tag findTag = query
-                        .select(tag)
-                        .from(tag)
-                        .where(tag.user.eq(user).and(tag.name.eq(name)))
-                        .fetchFirst();
-
-                if (findTag == null) {
-                    findTag = new Tag(user, name);
-                    em.persist(findTag);
-                }
-                list.add(findTag);
+                Tag tag = new Tag(user, memo,name);
+                    em.persist(tag);
 
             }
-            // 메모 추가 후, 태그 메모 테이블에 추가
-            em.persist(memo);
-            for (Tag tag : list) {
-                TagMemo tagMemo = new TagMemo(memo, tag);
-                em.persist(tagMemo);
-            }
-        } else {
-            em.persist(memo);
         }
 
         em.close();
@@ -94,24 +71,11 @@ public class CustomTagMemoRepository {
         findMemo.changeMemo(memoUpdateDto.getNewKey(), memoUpdateDto.getContent());
 
         memoUpdateDto.getTag().forEach((key, value) -> {
-                    if (value == false) {
-
-                        Tag removeTag = query.select(tag)
-                                .from(tag)
-                                .where(tag.name.eq(key).and(tag.user.eq(findMemo.getUser())))
-                                .fetchFirst();
-
-                        query.delete(tagMemo)
-                                .where(tagMemo.memo.eq(findMemo).and(
-                                        tagMemo.tag.eq(removeTag))).execute();
-
-                    }
                     // 태그가 이미 있는 거면 놔두고, 없으면 태그메모테이블과 태그에 새로 추가
                     if (value == true) {
                         Tag findTag = tagRepository.findByName(key).orElse(null);
                         if (findTag == null) {
-                            Tag newTag = tagRepository.save(new Tag(memo.getUser(), key));
-                            em.persist(new TagMemo(memo, newTag));
+                            tagRepository.save(new Tag(memo.getUser(), memo, key));
                         }
                     }
                 }
@@ -121,65 +85,38 @@ public class CustomTagMemoRepository {
 
     public void deleteMemo(Memo memo) {
         memo = em.merge(memo);
-
-        query.delete(tagMemo)
-                .where(tagMemo.memo.eq(memo))
-                .execute();
-
         em.remove(memo);
     }
 
-    public void deleteAllTagMemo() {
-        query.delete(tagMemo);
-    }
-
-    public List<TagMemo> findAllTagMemo() {
-        return query.select(tagMemo)
-                .from(tagMemo)
-                .fetch();
-    }
-
-    public List<TagMemo> findAllTagMemoByMemo(Memo memo) {
-        return query.select(tagMemo)
-                .from(tagMemo)
-                .where(tagMemo.memo.eq(memo))
-                .fetch();
-
-    }
-
-    public List<MemoListDto> findAllForList(Long id, Pageable pageable, String tagName) {
-
-        User user = em.find(User.class, id);
-
-        if (tagName == null) {
-            return query.select(Projections.constructor(MemoListDto.class,
-                            memo.keyword,
-                            memo.content))
-                    .from(memo)
-                    .leftJoin(tagMemo).on(memo.id.eq(tagMemo.memo.id))
-                    .leftJoin(tagMemo.tag, tag)
-                    .where(memo.user.eq(user), tag.user.eq(user), tagMemo.memo.in(memo), tag.name.eq((String) null))
-                    .orderBy(memo.id.desc())
-                    .offset(pageable.getOffset())
-                    .limit(pageable.getPageSize())
-                    .fetch();
-        }
-
-        return query.select(Projections.constructor(MemoListDto.class,
-                memo.keyword,
-                memo.content,
-                Expressions.list(
-                        select(tag.name)
-                                .from(tag)
-                                .where(tag.name.in(tagName))
-                )))
-                .from(memo)
-                .leftJoin(tagMemo).on(memo.id.eq(tagMemo.memo.id))
-                .leftJoin(tagMemo.tag, tag)
-                .where(memo.user.eq(user), tag.user.eq(user), tagMemo.memo.in(memo), tag.name.eq(tagName))
-                .orderBy(memo.id.desc())
+    public List<MemoListDto> findAllForList(Long id, Pageable pageable, String name) {
+        System.out.println("시작");
+        List<Memo> memoList = query.select(memo)
+                .from(memo, tag)
+                .where(tag.name.eq(name), tag.memo.user.id.eq(id))
+                .orderBy(tag.memo.id.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
+
+        List<Tag> tagList = query.select(tag)
+                .from(tag)
+                .where(tag.memo.in(memoList))
+                .orderBy(tag.memo.id.desc())
+                .fetch();
+
+        List<MemoListDto> list = new ArrayList<>();
+        List<String> tags = new ArrayList<>();
+        for (Memo memo : memoList) {
+            for (Tag tag : tagList) {
+                if (memo == tag.getMemo()) {
+                    tags.add(tag.getName());
+                }
+            }
+            list.add(new MemoListDto(memo.getKeyword(), memo.getContent(), tags));
+        }
+
+        return list;
+
     }
+
 }

@@ -11,4 +11,5 @@ public interface MemoRepository extends JpaRepository<Memo, Long> {
     @Query("select m from Memo m where m.keyword = :keyword")
     Optional<Memo> findByKeyword(String keyword);
     Optional<Memo> findByKeywordAndUser(String keyword, User user);
+
 }
