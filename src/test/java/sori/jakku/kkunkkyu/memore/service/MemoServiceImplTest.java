@@ -6,17 +6,15 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
-import sori.jakku.kkunkkyu.memore.domain.Memo;
-import sori.jakku.kkunkkyu.memore.domain.Tag;
-import sori.jakku.kkunkkyu.memore.domain.TagMemo;
-import sori.jakku.kkunkkyu.memore.domain.User;
+import sori.jakku.kkunkkyu.memore.domain.*;
+import sori.jakku.kkunkkyu.memore.domain.dto.MemoListDto;
 import sori.jakku.kkunkkyu.memore.domain.dto.MemoUpdateDto;
 import sori.jakku.kkunkkyu.memore.domain.dto.MemoWriteDto;
 import sori.jakku.kkunkkyu.memore.exception.DuplicateMemoException;
 import sori.jakku.kkunkkyu.memore.exception.MemoNotFoundException;
 import sori.jakku.kkunkkyu.memore.exception.UserNotFoundException;
-import sori.jakku.kkunkkyu.memore.repository.CustomTagMemoRepository;
 import sori.jakku.kkunkkyu.memore.repository.MemoRepository;
 import sori.jakku.kkunkkyu.memore.repository.TagRepository;
 import sori.jakku.kkunkkyu.memore.repository.UserRepository;
@@ -41,12 +39,9 @@ class MemoServiceImplTest {
     private MemoRepository memoRepository;
     @Autowired
     private TagRepository tagRepository;
-    @Autowired
-    private CustomTagMemoRepository tagMemoRepository;
 
     @BeforeEach
     void clean() {
-        tagMemoRepository.deleteAllTagMemo();
         tagRepository.deleteAll();
         memoRepository.deleteAll();
 
@@ -69,13 +64,10 @@ class MemoServiceImplTest {
 
         Tag tag = tagRepository.findByName(list.get(0)).orElse(null);
 
-        List<TagMemo> tagMemoList = tagMemoRepository.findAllTagMemoByMemo(memo);
-
         assertThat(memo).isNotNull();
         assertThat(memo.getKeyword()).isEqualTo(memoWriteDto.getKeyword());
         assertThat(tag).isNotNull();
         assertThat(tag.getName()).isEqualTo(list.get(0));
-        assertThat(tagMemoList.size()).isNotEqualTo(0);
 
     }
     @Test
@@ -92,14 +84,12 @@ class MemoServiceImplTest {
 
         // 둘 다 없는 값
         Tag tag = tagRepository.findByName("noTag").orElse(null);
-        List<TagMemo> tagMemoList = tagMemoRepository.findAllTagMemoByMemo(memo);
 
         assertThat(memo).isNotNull();
         assertThat(memo.getKeyword()).isEqualTo(memoWriteDto.getKeyword());
 
         assertThat(tag).isNull();
 
-        assertThat(tagMemoList.size()).isEqualTo(0);
 
     }
 
@@ -117,7 +107,6 @@ class MemoServiceImplTest {
 
         // 둘 다 없는 값
         Tag tag = tagRepository.findByName("noTag").orElse(null);
-        List<TagMemo> tagMemoList = tagMemoRepository.findAllTagMemoByMemo(memo);
 
         assertThat(memo).isNotNull();
         assertThat(memo.getKeyword()).isEqualTo(memoWriteDto.getKeyword());
@@ -125,7 +114,6 @@ class MemoServiceImplTest {
 
         assertThat(tag).isNull();
 
-        assertThat(tagMemoList.size()).isEqualTo(0);
 
     }
     @Test
@@ -145,7 +133,6 @@ class MemoServiceImplTest {
 
         Tag tag = tagRepository.findByName(list.get(0)).orElse(null);
 
-        List<TagMemo> tagMemoList = tagMemoRepository.findAllTagMemoByMemo(memo);
 
         assertThat(memo).isNotNull();
         assertThat(memo.getKeyword()).isEqualTo(memoWriteDto.getKeyword());
@@ -154,7 +141,6 @@ class MemoServiceImplTest {
         assertThat(tag).isNotNull();
         assertThat(tag.getName()).isEqualTo(list.get(0));
 
-        assertThat(tagMemoList.size()).isNotEqualTo(0);
 
     }
 
@@ -200,15 +186,12 @@ class MemoServiceImplTest {
         Memo memo = memoRepository.findByKeyword("newKey").orElse(null);
         Tag tag1 = tagRepository.findByName("tag1").orElse(null);
         Tag tag2 = tagRepository.findByName("tag2").orElse(null);
-        List<TagMemo> allTagMemoByMemo = tagMemoRepository.findAllTagMemoByMemo(memo);
 
         assertThat(memo).isNotNull();
         assertThat(memo.getKeyword()).isEqualTo("newKey");
         assertThat(memo.getContent()).isEqualTo("newCont");
         assertThat(tag1).isNotNull();
         assertThat(tag2).isNotNull();
-        assertThat(allTagMemoByMemo.get(0).getTag().getId()).isEqualTo(tag2.getId());
-        assertThat(allTagMemoByMemo.size()).isEqualTo(1);
 
     }
     @Test
@@ -233,13 +216,11 @@ class MemoServiceImplTest {
 
         Memo memo = memoRepository.findByKeyword("newKey").orElse(null);
         Tag tag1 = tagRepository.findByName("tag1").orElse(null);
-        List<TagMemo> allTagMemoByMemo = tagMemoRepository.findAllTagMemoByMemo(memo);
 
         assertThat(memo).isNotNull();
         assertThat(memo.getKeyword()).isEqualTo("newKey");
         assertThat(memo.getContent()).isEqualTo("newCont");
         assertThat(tag1).isNotNull();
-        assertThat(allTagMemoByMemo.size()).isEqualTo(0);
 
 
     }
@@ -280,10 +261,30 @@ class MemoServiceImplTest {
 
         Memo memo = memoRepository.findByKeyword("keyword").orElse(null);
         Tag tag = tagRepository.findByName("tag1").orElse(null);
-        List<TagMemo> allTagMemoByMemo = tagMemoRepository.findAllTagMemo();
 
         assertThat(memo).isNull();
         assertThat(tag).isNotNull();
-        assertThat(allTagMemoByMemo.size()).isEqualTo(0);
+    }
+    @Test
+    @DisplayName("메모 리스트 : 1개")
+    void memoList_one() throws DuplicateMemoException {
+        User user = new User();
+        User newUser = userRepository.save(user);
+
+        List<String> list = new ArrayList<>();
+        list.add("tag1");
+
+        for (int i = 0; i < 10; i++) {
+            MemoWriteDto memoWriteDto = new MemoWriteDto("keyword"+i, "content", list);
+            memoService.write(newUser.getId(), memoWriteDto);
+        }
+
+        List<MemoListDto> memoList = memoService.memoList(user.getId(), PageRequest.of(0, 12), "tag1");
+        assertThat(memoList.size()).isEqualTo(10);
+        for (int i = 0; i < memoList.size(); i++) {
+            System.out.println("keyword = " + memoList.get(i).getKeyword());
+            System.out.println("content = " + memoList.get(i).getContent());
+            System.out.println("tag = " + memoList.get(i).getTag().get(i));
+        }
     }
 }

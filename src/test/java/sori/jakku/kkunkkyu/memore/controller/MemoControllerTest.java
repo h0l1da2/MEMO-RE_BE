@@ -60,12 +60,33 @@ class MemoControllerTest {
 
     @BeforeEach
     void clean() {
-        tagMemoRepository.deleteAllTagMemo();
         tagRepository.deleteAll();
         memoRepository.deleteAll();
 
     }
 
+    @Test
+    @DisplayName("메모 읽기 성공")
+    void 메모_읽기() throws Exception {
+        User user = new User("username", "pwd1234");
+        User newUser = userRepository.save(user);
+        String token = tokenService.creatToken(newUser.getId(), newUser.getUsername());
+
+        List<String> list = new ArrayList<>();
+        list.add("tag");
+        for (int i = 0; i < 10; i++) {
+            memoService.write(user.getId(), new MemoWriteDto("keyword"+i, "content"+i, list));
+        }
+
+        mockMvc.perform(
+                        get("/memo?tag=tag&pageNumber=0&offset=0")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header(HttpHeaders.AUTHORIZATION, "Bearer "+token)
+                                )
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$.response").value(Response.OK))
+                .andDo(print());
+    }
     @Test
     @DisplayName("태그 삭제 성공")
     void deleteMemo() throws Exception {
