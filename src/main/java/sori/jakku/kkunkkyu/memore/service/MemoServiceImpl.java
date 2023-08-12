@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import sori.jakku.kkunkkyu.memore.domain.Memo;
 import sori.jakku.kkunkkyu.memore.domain.User;
-import sori.jakku.kkunkkyu.memore.domain.dto.ConTagUpdateDto;
+import sori.jakku.kkunkkyu.memore.domain.dto.MemoUpdateDto;
 import sori.jakku.kkunkkyu.memore.domain.dto.MemoWriteDto;
 import sori.jakku.kkunkkyu.memore.exception.DuplicateMemoException;
 import sori.jakku.kkunkkyu.memore.exception.MemoNotFoundException;
@@ -42,16 +42,18 @@ public class MemoServiceImpl implements MemoService {
     }
 
     @Override
-    public void changeContentTag(Long id, ConTagUpdateDto conTagUpdateDto) throws MemoNotFoundException, UserNotFoundException {
+    public void changeContentTag(Long id, MemoUpdateDto memoUpdateDto) throws MemoNotFoundException, UserNotFoundException, DuplicateMemoException {
         User user = userService.userById(id);
 
-        Memo memo = memoRepository.findByKeyword(conTagUpdateDto.getOriginKey()).orElseThrow(MemoNotFoundException::new);
+        Memo memo = memoRepository.findByKeyword(memoUpdateDto.getOriginKey()).orElseThrow(MemoNotFoundException::new);
 
         if (memo.getUser() != user) {
             throw new UserNotFoundException("본인 메모가 아닙니다.");
         }
 
-        tagMemoRepository.updateMemoAndTag(memo, conTagUpdateDto);
+        memoRepository.findByKeywordAndUser(memoUpdateDto.getNewKey(), user).orElseThrow(DuplicateMemoException::new);
+        tagMemoRepository.updateMemoAndTag(memo, memoUpdateDto);
+
     }
 
     @Override

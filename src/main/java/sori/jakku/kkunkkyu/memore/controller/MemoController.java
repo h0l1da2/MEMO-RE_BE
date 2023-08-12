@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import sori.jakku.kkunkkyu.memore.domain.dto.ConTagUpdateDto;
+import sori.jakku.kkunkkyu.memore.domain.dto.MemoUpdateDto;
 import sori.jakku.kkunkkyu.memore.domain.dto.MemoWriteDto;
 import sori.jakku.kkunkkyu.memore.domain.dto.Response;
 import sori.jakku.kkunkkyu.memore.exception.DuplicateMemoException;
@@ -47,7 +47,7 @@ public class MemoController {
     }
 
     @PutMapping
-    public ResponseEntity<String> changeMemo(@RequestBody @Valid ConTagUpdateDto conTagUpdateDto, HttpServletRequest request) {
+    public ResponseEntity<String> changeMemo(@RequestBody @Valid MemoUpdateDto memoUpdateDto, HttpServletRequest request) {
         /**
          * 원래 키워드 확인 후,
          * 있다면 전부 수정
@@ -57,15 +57,18 @@ public class MemoController {
         Long id = webService.getIdInHeader(request);
 
         try {
-            memoService.changeContentTag(id, conTagUpdateDto);
+            memoService.changeContentTag(id, memoUpdateDto);
         } catch (MemoNotFoundException e) {
-            log.info("중복 키워드");
-            jsonObject.addProperty("response", Response.DUPLICATE);
+            log.info("없는 키워드");
+            jsonObject.addProperty("response", Response.NOT_FOUND);
             return webService.badResponse(jsonObject);
         } catch (UserNotFoundException e) {
             log.info("본인 메모가 아님");
             jsonObject.addProperty("response", Response.BAD);
             return webService.badResponse(jsonObject);
+        } catch (DuplicateMemoException e) {
+            log.info("중복 키워드");
+            jsonObject.addProperty("response", Response.DUPLICATE);
         }
 
         return webService.okResponse(jsonObject);

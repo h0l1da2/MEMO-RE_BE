@@ -50,6 +50,7 @@ public class WebServiceImpl implements WebService {
     @Override
     public Long getIdInHeader(HttpServletRequest request) {
         String token = request.getHeader(HttpHeaders.AUTHORIZATION);
+        token = token.substring("Bearer ".length());
         return tokenService.getIdByToken(token);
     }
 }
