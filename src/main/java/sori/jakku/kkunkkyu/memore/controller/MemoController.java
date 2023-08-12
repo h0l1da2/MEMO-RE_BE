@@ -47,7 +47,7 @@ public class MemoController {
     }
 
     @PutMapping
-    public ResponseEntity<String> changeContentTag(@RequestBody @Valid ConTagUpdateDto conTagUpdateDto, HttpServletRequest request) {
+    public ResponseEntity<String> changeMemo(@RequestBody @Valid ConTagUpdateDto conTagUpdateDto, HttpServletRequest request) {
         /**
          * 원래 키워드 확인 후,
          * 있다면 전부 수정
