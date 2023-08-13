@@ -5,17 +5,20 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import sori.jakku.kkunkkyu.memore.domain.dto.MemoListDto;
 import sori.jakku.kkunkkyu.memore.domain.dto.Response;
 import sori.jakku.kkunkkyu.memore.domain.dto.TagDto;
 import sori.jakku.kkunkkyu.memore.exception.ConditionNotMatchException;
 import sori.jakku.kkunkkyu.memore.exception.UserNotFoundException;
+import sori.jakku.kkunkkyu.memore.service.inter.MemoService;
 import sori.jakku.kkunkkyu.memore.service.inter.TagService;
 import sori.jakku.kkunkkyu.memore.service.inter.WebService;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -23,6 +26,7 @@ import sori.jakku.kkunkkyu.memore.service.inter.WebService;
 @RequiredArgsConstructor
 public class MainController {
 
+    private final MemoService memoService;
     private final TagService tagService;
     private final WebService webService;
 
@@ -60,4 +64,15 @@ public class MainController {
         return webService.okResponse(jsonObject);
     }
 
+    @GetMapping("/main")
+    public ResponseEntity<String> list(@RequestParam(required = false) String tag, @PageableDefault(size = 12) Pageable pageable, HttpServletRequest request) {
+
+        JsonObject jsonObject = new JsonObject();
+        Long id = webService.getIdInHeader(request);
+        List<MemoListDto> memoList = memoService.memoList(id, pageable, tag);
+
+        String memoListJson = webService.objectToJson(memoList);
+        jsonObject.addProperty("memoList", memoListJson);
+        return webService.okResponse(jsonObject);
+    }
 }

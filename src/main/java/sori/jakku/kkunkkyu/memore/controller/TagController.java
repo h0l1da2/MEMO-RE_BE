@@ -28,7 +28,7 @@ public class TagController {
         Long id = webService.getIdInHeader(request);
 
         try {
-
+            // TODO -> 태그 추가 태그 양식 문제 { name: tag }
             String tag = tagService.writeTag(id, name);
             jsonObject.addProperty("name", tag);
 
