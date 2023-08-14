@@ -14,4 +14,8 @@ public class MemoListDto {
     private String content;
     private List<String> tag;
 
+    public MemoListDto(String keyword, String content) {
+        this.keyword = keyword;
+        this.content = content;
+    }
 }

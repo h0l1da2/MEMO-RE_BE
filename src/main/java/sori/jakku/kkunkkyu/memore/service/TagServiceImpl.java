@@ -9,6 +9,7 @@ import sori.jakku.kkunkkyu.memore.domain.dto.TagDto;
 import sori.jakku.kkunkkyu.memore.domain.dto.TagWriteDto;
 import sori.jakku.kkunkkyu.memore.exception.ConditionNotMatchException;
 import sori.jakku.kkunkkyu.memore.exception.DuplicateMemoException;
+import sori.jakku.kkunkkyu.memore.exception.MemoNotFoundException;
 import sori.jakku.kkunkkyu.memore.exception.UserNotFoundException;
 import sori.jakku.kkunkkyu.memore.repository.CustomTagMemoRepository;
 import sori.jakku.kkunkkyu.memore.repository.TagRepository;
@@ -80,12 +81,8 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public void deleteTag(Long id, TagWriteDto tagWriteDto) throws UserNotFoundException {
-        User user = userService.userById(id);
-        if (user == null) {
-            throw new UserNotFoundException();
-        }
-        tagRepository.deleteByName(tagWriteDto.getName());
+    public void deleteTag(Long id, TagWriteDto tagWriteDto) throws UserNotFoundException, MemoNotFoundException {
+        customTagMemoRepository.deleteTag(id, tagWriteDto.getName());
     }
 
     private boolean validTag(TagDto tagDto) {

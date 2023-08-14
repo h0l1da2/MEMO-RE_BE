@@ -12,6 +12,9 @@ import sori.jakku.kkunkkyu.memore.domain.dto.MemoListDto;
 import sori.jakku.kkunkkyu.memore.domain.dto.MemoUpdateDto;
 import sori.jakku.kkunkkyu.memore.domain.dto.MemoWriteDto;
 import sori.jakku.kkunkkyu.memore.domain.dto.TagDto;
+import sori.jakku.kkunkkyu.memore.exception.ConditionNotMatchException;
+import sori.jakku.kkunkkyu.memore.exception.MemoNotFoundException;
+import sori.jakku.kkunkkyu.memore.exception.UserNotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -94,7 +97,7 @@ public class CustomTagMemoRepository {
     }
 
     public List<MemoListDto> findAllForList(Long id, Pageable pageable, String name) {
-        System.out.println("시작");
+
         List<Memo> memoList = query.select(memo)
                 .from(memo, tag)
                 .where(tag.name.eq(name), tag.memo.user.id.eq(id))
@@ -103,25 +106,49 @@ public class CustomTagMemoRepository {
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        List<Tag> tagList = query.select(tag)
-                .from(tag)
-                .where(tag.memo.in(memoList))
-                .orderBy(tag.memo.id.desc())
-                .fetch();
-
         List<MemoListDto> list = new ArrayList<>();
-        List<String> tags = new ArrayList<>();
-        for (Memo memo : memoList) {
-            for (Tag tag : tagList) {
-                if (memo == tag.getMemo()) {
-                    tags.add(tag.getName());
+
+        if (name != null) {
+            List<Tag> tagList = query.select(tag)
+                    .from(tag)
+                    .where(tag.memo.in(memoList))
+                    .orderBy(tag.memo.id.desc())
+                    .fetch();
+            List<String> tags = new ArrayList<>();
+            for (Memo memo : memoList) {
+                for (Tag tag : tagList) {
+                    if (memo == tag.getMemo()) {
+                        tags.add(tag.getName());
+                    }
                 }
+                list.add(new MemoListDto(memo.getKeyword(), memo.getContent(), tags));
             }
-            list.add(new MemoListDto(memo.getKeyword(), memo.getContent(), tags));
+        }
+        if (name == null) {
+            for (Memo memo : memoList) {
+                list.add(new MemoListDto(memo.getKeyword(), memo.getContent()));
+            }
         }
 
         return list;
 
     }
 
+    public void deleteTag(Long id, String name) throws MemoNotFoundException, UserNotFoundException {
+        User user = em.find(User.class, id);
+        if (user == null) {
+            throw new UserNotFoundException();
+        }
+
+        Tag findTag = query.select(tag)
+                .from(tag)
+                .where(tag.name.eq(name), tag.user.eq(user))
+                .fetchFirst();
+
+        if (findTag == null) {
+            throw new MemoNotFoundException();
+        }
+
+        em.remove(findTag);
+    }
 }
