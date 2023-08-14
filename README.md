@@ -116,4 +116,5 @@ BE 강휴일<br>
 - **10일 간의 개발 기간이 너무도 짧다. 내가 개발을 얼마나 빨리 할 수 있는지 일정 관리가 안 된다.**
     - 애자일 방식을 이용해 스프린트를 나눠 개발하여 두루뭉술한 일정에 따라가는 것이 아니라 역량에 따라 개발할 수 있었다.
 
-[👍 그 동안 함께해왔던 기록 notion 확인하기 클릭!](https://www.notion.so/4b0c4a898ac146f099c3fdc43a278860?pvs=21)
+[👍 그 동안 함께해왔던 기록 notion 확인하기 클릭!](https://www.notion.so/4b0c4a898ac146f099c3fdc43a278860?pvs=21)<br>
+[✉️ 개발 일기 훑어보기 클릭!](https://song-eun.notion.site/song-eun/MEMO-RE-4b0c4a898ac146f099c3fdc43a278860)
