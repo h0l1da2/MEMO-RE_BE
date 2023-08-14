@@ -7,7 +7,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sori.jakku.kkunkkyu.memore.domain.dto.Response;
+import sori.jakku.kkunkkyu.memore.domain.dto.TagWriteDto;
 import sori.jakku.kkunkkyu.memore.exception.ConditionNotMatchException;
+import sori.jakku.kkunkkyu.memore.exception.DuplicateMemoException;
 import sori.jakku.kkunkkyu.memore.exception.UserNotFoundException;
 import sori.jakku.kkunkkyu.memore.service.inter.TagService;
 import sori.jakku.kkunkkyu.memore.service.inter.WebService;
@@ -21,15 +23,16 @@ public class TagController {
     private final TagService tagService;
     private final WebService webService;
 
+    // TODO 태그 삭제, 리스트
+
     @PostMapping
-    public ResponseEntity<String> write(@RequestBody String name, HttpServletRequest request) {
+    public ResponseEntity<String> write(@RequestBody TagWriteDto tagWriteDto, HttpServletRequest request) {
 
         JsonObject jsonObject = new JsonObject();
         Long id = webService.getIdInHeader(request);
 
         try {
-            // TODO -> 태그 추가 태그 양식 문제 { name: tag }
-            String tag = tagService.writeTag(id, name);
+            String tag = tagService.writeTag(id, tagWriteDto.getName());
             jsonObject.addProperty("name", tag);
 
         } catch (UserNotFoundException e) {
@@ -44,6 +47,11 @@ public class TagController {
             jsonObject.addProperty("response", Response.NOT_VALID);
             return webService.badResponse(jsonObject);
 
+        } catch (DuplicateMemoException e) {
+
+            log.error("태그 중복");
+            jsonObject.addProperty("response", Response.DUPLICATE);
+            return webService.badResponse(jsonObject);
         }
 
         return webService.okResponse(jsonObject);

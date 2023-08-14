@@ -3,7 +3,6 @@ package sori.jakku.kkunkkyu.memore.domain;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import sori.jakku.kkunkkyu.memore.domain.dto.MemoWriteDto;
 
 @Getter
 @Entity
@@ -18,14 +17,19 @@ public class Memo {
     @JoinColumn(name = "user_id")
     private User user;
 
-    public Memo(MemoWriteDto memoWriteDto, User user) {
-        this.keyword = memoWriteDto.getKeyword();
-        this.content = memoWriteDto.getContent();
+    public Memo(User user) {
         this.user = user;
     }
-
     public void changeMemo(String keyword, String content) {
         this.keyword = keyword;
+        this.content = content;
+    }
+
+    public void writeOnlyKeyword(String keyword) {
+        this.keyword = keyword;
+    }
+
+    public void writeOnlyContent(String content) {
         this.content = content;
     }
 }

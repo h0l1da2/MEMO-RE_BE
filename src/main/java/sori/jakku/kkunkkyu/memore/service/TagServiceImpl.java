@@ -7,6 +7,7 @@ import sori.jakku.kkunkkyu.memore.domain.Tag;
 import sori.jakku.kkunkkyu.memore.domain.User;
 import sori.jakku.kkunkkyu.memore.domain.dto.TagDto;
 import sori.jakku.kkunkkyu.memore.exception.ConditionNotMatchException;
+import sori.jakku.kkunkkyu.memore.exception.DuplicateMemoException;
 import sori.jakku.kkunkkyu.memore.exception.UserNotFoundException;
 import sori.jakku.kkunkkyu.memore.repository.CustomTagMemoRepository;
 import sori.jakku.kkunkkyu.memore.repository.TagRepository;
@@ -49,7 +50,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public String writeTag(Long id, String name) throws UserNotFoundException, ConditionNotMatchException {
+    public String writeTag(Long id, String name) throws UserNotFoundException, ConditionNotMatchException, DuplicateMemoException {
         /**
          * 유저 찾고 이름 검증 후, 태그 생성 및 DB INSERT
          */
@@ -59,11 +60,17 @@ public class TagServiceImpl implements TagService {
         }
 
         // 한글이나 영어가 포함되어있지 않다면
-        if (10 < name.length() |
+        if (20 < name.length() |
                 (!name.matches(".*[ㄱ-ㅎㅏ-ㅣ가-힣]+.*") &&
                 !name.matches(".*[a-zA-Z]+.*") &&
                 !name.matches(".*\\d+.*"))) {
             throw new ConditionNotMatchException();
+        }
+
+        Tag findTag = tagRepository.findByName(name).orElse(null);
+
+        if (findTag != null) {
+            throw new DuplicateMemoException("태그 중복");
         }
 
         Tag tag = tagRepository.save(new Tag(user, name));

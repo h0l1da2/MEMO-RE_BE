@@ -17,7 +17,7 @@ public class MemoWriteDto {
     private String keyword;
     @Size(max = 100)
     private String content;
-    @Size(min = 1, max = 10)
+    @Size(max = 10)
     private List<String> tag;
 
     public MemoWriteDto(String keyword) {

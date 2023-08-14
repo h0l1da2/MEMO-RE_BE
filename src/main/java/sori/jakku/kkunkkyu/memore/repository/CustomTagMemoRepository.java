@@ -45,7 +45,12 @@ public class CustomTagMemoRepository {
          * 태그 없으면 추가, 불러오기
          * 태그 메모 연결 테이블에 + 메모 후 DB 추가
          */
-        Memo memo = new Memo(memoWriteDto, user);
+        Memo memo = new Memo(user);
+        memo.writeOnlyKeyword(memoWriteDto.getKeyword());
+        if (memoWriteDto.getContent() != null) {
+            memo.writeOnlyContent(memoWriteDto.getContent());
+        }
+
         em.persist(memo);
         // 태그가 있을 경우, 태그 추가 및 불러오기
         if (memoWriteDto.getTag() != null) {
