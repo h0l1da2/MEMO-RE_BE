@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import sori.jakku.kkunkkyu.memore.domain.Tag;
 import sori.jakku.kkunkkyu.memore.domain.User;
 import sori.jakku.kkunkkyu.memore.domain.dto.TagDto;
+import sori.jakku.kkunkkyu.memore.domain.dto.TagWriteDto;
 import sori.jakku.kkunkkyu.memore.exception.ConditionNotMatchException;
 import sori.jakku.kkunkkyu.memore.exception.DuplicateMemoException;
 import sori.jakku.kkunkkyu.memore.exception.UserNotFoundException;
@@ -78,7 +79,16 @@ public class TagServiceImpl implements TagService {
         return tag.getName();
     }
 
-    private boolean validTag(TagDto tagDto) throws ConditionNotMatchException {
+    @Override
+    public void deleteTag(Long id, TagWriteDto tagWriteDto) throws UserNotFoundException {
+        User user = userService.userById(id);
+        if (user == null) {
+            throw new UserNotFoundException();
+        }
+        tagRepository.deleteByName(tagWriteDto.getName());
+    }
+
+    private boolean validTag(TagDto tagDto) {
         if (10 < tagDto.getTagA().length()) {
             return false;
         }
