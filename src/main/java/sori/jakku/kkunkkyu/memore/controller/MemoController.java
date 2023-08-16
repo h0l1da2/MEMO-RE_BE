@@ -43,7 +43,6 @@ public class MemoController {
         return webService.okResponse(jsonObject);
     }
 
-    // TODO 메모 태그 삭제
     @DeleteMapping
     public ResponseEntity<String> deleteMemo(@RequestBody String keyword, HttpServletRequest request) {
         JsonObject jsonObject = new JsonObject();

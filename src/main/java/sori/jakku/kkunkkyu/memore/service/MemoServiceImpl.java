@@ -70,7 +70,8 @@ public class MemoServiceImpl implements MemoService {
     public void removeMemo(Long id, String keyword) throws MemoNotFoundException, UserNotFoundException {
         User user = userService.userById(id);
 
-        Memo memo = memoRepository.findByKeyword(keyword).orElseThrow(MemoNotFoundException::new);
+        Memo memo = memoRepository.findByKeywordAndUser(keyword, user)
+                .orElseThrow(MemoNotFoundException::new);
 
         if (memo.getUser() != user) {
             throw new UserNotFoundException("본인 메모가 아닙니다.");

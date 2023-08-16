@@ -116,9 +116,18 @@ public class CustomTagMemoRepository {
 
     }
 
-    public void deleteMemo(Memo memo) {
-        memo = em.merge(memo);
-        em.remove(memo);
+    public void deleteMemo(Memo findMemo) {
+        // 태그메모, 메모 삭제
+        findMemo = em.merge(findMemo);
+
+        List<TagMemo> tagMemoList = query.select(tagMemo)
+                .where(memo.eq(findMemo))
+                .fetchJoin()
+                .fetch();
+
+        tagMemoList.forEach(tm ->
+                em.remove(tm));
+        em.remove(findMemo);
     }
 
     public List<MemoListDto> findAllForList(Long id, Pageable pageable, String name) {
