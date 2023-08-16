@@ -12,7 +12,6 @@ import sori.jakku.kkunkkyu.memore.domain.dto.MemoListDto;
 import sori.jakku.kkunkkyu.memore.domain.dto.MemoUpdateDto;
 import sori.jakku.kkunkkyu.memore.domain.dto.MemoWriteDto;
 import sori.jakku.kkunkkyu.memore.domain.dto.TagDto;
-import sori.jakku.kkunkkyu.memore.exception.ConditionNotMatchException;
 import sori.jakku.kkunkkyu.memore.exception.MemoNotFoundException;
 import sori.jakku.kkunkkyu.memore.exception.UserNotFoundException;
 
@@ -34,9 +33,9 @@ public class CustomTagMemoRepository {
     @Transactional
     public TagDto saveTagMain(User user, TagDto tagDto) {
         // 트랜잭션 시작
-        tagRepository.save(new Tag(user, tagDto.getTagA()));
-        tagRepository.save(new Tag(user, tagDto.getTagB()));
-        tagRepository.save(new Tag(user, tagDto.getTagC()));
+        em.persist(new Tag(user, tagDto.getTagA()));
+        em.persist(new Tag(user, tagDto.getTagB()));
+        em.persist(new Tag(user, tagDto.getTagC()));
         // 끝
         return tagDto;
     }
@@ -81,7 +80,7 @@ public class CustomTagMemoRepository {
         memoUpdateDto.getTag().forEach((key, value) -> {
                     // 태그가 이미 있는 거면 놔두고, 없으면 태그메모테이블과 태그에 새로 추가
                     if (value == true) {
-                        Tag findTag = tagRepository.findByName(key).orElse(null);
+                        Tag findTag = tagRepository.findByNameAndUser(key, memo.getUser()).orElse(null);
                         if (findTag == null) {
                             tagRepository.save(new Tag(memo.getUser(), memo, key));
                         }
@@ -140,10 +139,7 @@ public class CustomTagMemoRepository {
             throw new UserNotFoundException();
         }
 
-        Tag findTag = query.select(tag)
-                .from(tag)
-                .where(tag.name.eq(name), tag.user.eq(user))
-                .fetchFirst();
+        Tag findTag = tagRepository.findByNameAndUser(name, user).orElse(null);
 
         if (findTag == null) {
             throw new MemoNotFoundException();
