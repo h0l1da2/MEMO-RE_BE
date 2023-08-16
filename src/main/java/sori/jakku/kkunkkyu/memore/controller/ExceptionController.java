@@ -25,7 +25,7 @@ public class ExceptionController {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseBody
-    public ResponseEntity<String> invalidRequestHnadler(MethodArgumentNotValidException e) {
+    public ResponseEntity<String> invalidRequestHandler(MethodArgumentNotValidException e) {
 
         JsonObject jsonObject = new JsonObject();
 
@@ -41,6 +41,9 @@ public class ExceptionController {
             }
             if (error.getField().equals("tag") && e.getMessage().contains("size")) {
                 jsonObject.addProperty("response", Response.SIZE);
+            }
+            if (error.getField().equals("tag")) {
+                jsonObject.addProperty("response", Response.TAG_NOT_VALID);
             }
         }
 

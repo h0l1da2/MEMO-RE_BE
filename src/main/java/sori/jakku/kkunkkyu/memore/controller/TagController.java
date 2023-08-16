@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sori.jakku.kkunkkyu.memore.domain.dto.Response;
 import sori.jakku.kkunkkyu.memore.domain.dto.TagWriteDto;
-import sori.jakku.kkunkkyu.memore.exception.ConditionNotMatchException;
 import sori.jakku.kkunkkyu.memore.exception.DuplicateMemoException;
 import sori.jakku.kkunkkyu.memore.exception.MemoNotFoundException;
 import sori.jakku.kkunkkyu.memore.exception.UserNotFoundException;
@@ -26,6 +25,13 @@ public class TagController {
 
     // TODO 태그 삭제, 리스트
     @GetMapping
+    public ResponseEntity<String> list(HttpServletRequest request) {
+        JsonObject jsonObject = new JsonObject();
+        Long id = webService.getIdInHeader(request);
+
+        tagService.tagList(id);
+        return webService.okResponse(jsonObject);
+    }
 
     @DeleteMapping
     public ResponseEntity<String> delete(@RequestBody TagWriteDto tagWriteDto, HttpServletRequest request) {
@@ -61,12 +67,6 @@ public class TagController {
 
             log.error("없는 유저.");
             jsonObject.addProperty("response", Response.USER_NOT_FOUND);
-            return webService.badResponse(jsonObject);
-
-        } catch (ConditionNotMatchException e) {
-
-            log.error("태그 양식이 다름.");
-            jsonObject.addProperty("response", Response.NOT_VALID);
             return webService.badResponse(jsonObject);
 
         } catch (DuplicateMemoException e) {
