@@ -12,5 +12,5 @@ public interface TagService {
     String writeForMain(Long id, TagDto tagDto) throws UserNotFoundException;
     String writeTag(Long id, String name) throws UserNotFoundException, DuplicateMemoException;
     void deleteTag(Long id, TagWriteDto tagWriteDto) throws UserNotFoundException, MemoNotFoundException;
-    List<TagWriteDto> tagList(Long id);
+    List<String> tagList(Long id) throws UserNotFoundException;
 }

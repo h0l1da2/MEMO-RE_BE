@@ -74,20 +74,14 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public List<TagWriteDto> tagList(Long id) {
-        return null;
-    }
+    public List<String> tagList(Long id) throws UserNotFoundException {
+        User user = userService.userById(id);
 
-    private boolean validTag(TagDto tagDto) {
-        if (10 < tagDto.getTagA().length()) {
-            return false;
+        if (user == null) {
+            throw new UserNotFoundException();
         }
-        if (10 < tagDto.getTagB().length()) {
-            return false;
-        }
-        if (10 < tagDto.getTagC().length()) {
-            return false;
-        }
-        return true;
+
+        return tagMemoRepository.findAllTag(id);
+
     }
 }

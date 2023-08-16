@@ -20,6 +20,7 @@ import java.util.List;
 
 import static sori.jakku.kkunkkyu.memore.domain.QMemo.*;
 import static sori.jakku.kkunkkyu.memore.domain.QTag.*;
+import static sori.jakku.kkunkkyu.memore.domain.QTagMemo.*;
 
 @Slf4j
 @Repository
@@ -146,5 +147,13 @@ public class CustomTagMemoRepository {
         }
 
         em.remove(findTag);
+    }
+
+    public List<String> findAllTag(Long id) {
+        return query.select(tag.name)
+                .from(tagMemo)
+                .where(tagMemo.tag.user.id.eq(id))
+                .fetchJoin()
+                .fetch();
     }
 }

@@ -14,6 +14,8 @@ import sori.jakku.kkunkkyu.memore.exception.UserNotFoundException;
 import sori.jakku.kkunkkyu.memore.service.inter.TagService;
 import sori.jakku.kkunkkyu.memore.service.inter.WebService;
 
+import java.util.List;
+
 @Slf4j
 @RestController
 @RequestMapping("/tag")
@@ -23,13 +25,23 @@ public class TagController {
     private final TagService tagService;
     private final WebService webService;
 
-    // TODO 태그 삭제, 리스트
     @GetMapping
     public ResponseEntity<String> list(HttpServletRequest request) {
         JsonObject jsonObject = new JsonObject();
         Long id = webService.getIdInHeader(request);
 
-        tagService.tagList(id);
+        try {
+
+            List<String> tagList = tagService.tagList(id);
+            String tagListJson = webService.objectToJson(tagList);
+            jsonObject.addProperty("tagList", tagListJson);
+
+        } catch (UserNotFoundException e) {
+            log.error("유저 찾을 수 없음 = {}", id);
+            jsonObject.addProperty("response", Response.USER_NOT_FOUND);
+            return webService.badResponse(jsonObject);
+        }
+
         return webService.okResponse(jsonObject);
     }
 
