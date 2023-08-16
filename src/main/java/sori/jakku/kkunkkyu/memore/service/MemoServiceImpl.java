@@ -50,16 +50,18 @@ public class MemoServiceImpl implements MemoService {
     }
 
     @Override
-    public void changeContentTag(Long id, MemoUpdateDto memoUpdateDto) throws MemoNotFoundException, UserNotFoundException, DuplicateMemoException {
+    public void changeMemo(Long id, MemoUpdateDto memoUpdateDto) throws MemoNotFoundException, UserNotFoundException, DuplicateMemoException {
         User user = userService.userById(id);
 
-        Memo memo = memoRepository.findByKeyword(memoUpdateDto.getOriginKey()).orElseThrow(MemoNotFoundException::new);
+        Memo memo = memoRepository.findByKeywordAndUser(memoUpdateDto.getOriginKey(), user)
+                .orElseThrow(MemoNotFoundException::new);
 
         if (memo.getUser() != user) {
             throw new UserNotFoundException("본인 메모가 아닙니다.");
         }
 
-        memoRepository.findByKeywordAndUser(memoUpdateDto.getNewKey(), user).orElseThrow(DuplicateMemoException::new);
+        memoRepository.findByKeywordAndUser(memoUpdateDto.getNewKey(), user)
+                .orElseThrow(DuplicateMemoException::new);
         tagMemoRepository.updateMemoAndTag(memo, memoUpdateDto);
 
     }

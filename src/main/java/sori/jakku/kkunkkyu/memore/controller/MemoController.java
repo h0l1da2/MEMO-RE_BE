@@ -65,7 +65,6 @@ public class MemoController {
         return webService.okResponse(jsonObject);
     }
 
-    // TODO 메모 태그 수정
     @PutMapping
     public ResponseEntity<String> changeMemo(@RequestBody @Valid MemoUpdateDto memoUpdateDto, HttpServletRequest request) {
         /**
@@ -77,17 +76,17 @@ public class MemoController {
         Long id = webService.getIdInHeader(request);
 
         try {
-            memoService.changeContentTag(id, memoUpdateDto);
+            memoService.changeMemo(id, memoUpdateDto);
         } catch (MemoNotFoundException e) {
-            log.info("없는 키워드");
+            log.info("없는 키워드 = {}", memoUpdateDto.getOriginKey());
             jsonObject.addProperty("response", Response.NOT_FOUND);
             return webService.badResponse(jsonObject);
         } catch (UserNotFoundException e) {
-            log.info("본인 메모가 아님");
+            log.info("본인 메모가 아님 = {} {}", id, memoUpdateDto.getOriginKey());
             jsonObject.addProperty("response", Response.BAD);
             return webService.badResponse(jsonObject);
         } catch (DuplicateMemoException e) {
-            log.info("중복 키워드");
+            log.info("중복 키워드 = {}", memoUpdateDto.getNewKey());
             jsonObject.addProperty("response", Response.DUPLICATE);
         }
 
@@ -109,7 +108,8 @@ public class MemoController {
         } catch (UserNotFoundException e) {
             log.info("유저를 찾을 수 없음 = {}", id);
             jsonObject.addProperty("response", Response.DUPLICATE);
-            return webService.badResponse(jsonObject);        }
+            return webService.badResponse(jsonObject);
+        }
 
         return webService.okResponse(jsonObject);
     }

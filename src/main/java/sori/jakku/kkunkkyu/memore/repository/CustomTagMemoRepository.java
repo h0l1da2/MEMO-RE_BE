@@ -91,13 +91,28 @@ public class CustomTagMemoRepository {
         memoUpdateDto.getTag().forEach((key, value) -> {
                     // 태그가 이미 있는 거면 놔두고, 없으면 태그메모테이블과 태그에 새로 추가
                     if (value == true) {
+                        Tag tag = tagRepository.findByNameAndUser(key, memo.getUser()).orElse(null);
+                        if (tag == null) {
+                            tag = tagRepository.save(new Tag(memo.getUser(), key));
+                        }
+                        em.persist(new TagMemo(findMemo, tag));
+                    }
+                    // 없애는 태그
+                    if (value == false) {
                         Tag findTag = tagRepository.findByNameAndUser(key, memo.getUser()).orElse(null);
                         if (findTag == null) {
-                            tagRepository.save(new Tag(memo.getUser(), memo, key));
+                            log.info("이미 없는 태그입니다.");
+                            return;
                         }
+
+                        TagMemo findTagMemo = query.select(tagMemo)
+                                .where(tagMemo.memo.eq(findMemo), tagMemo.tag.eq(findTag))
+                                .fetchFirst();
+
+                        em.remove(findTagMemo);
+
                     }
-                }
-                );
+            });
 
     }
 

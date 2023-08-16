@@ -181,7 +181,7 @@ class MemoServiceImplTest {
         map.put("tag1", false);
         memoUpdateDto.setTag(map);
 
-        memoService.changeContentTag(newUser.getId(), memoUpdateDto);
+        memoService.changeMemo(newUser.getId(), memoUpdateDto);
 
         Memo memo = memoRepository.findByKeyword("newKey").orElse(null);
         Tag tag1 = tagRepository.findByName("tag1").orElse(null);
@@ -212,7 +212,7 @@ class MemoServiceImplTest {
         map.put("tag1", false);
         memoUpdateDto.setTag(map);
 
-        memoService.changeContentTag(newUser.getId(), memoUpdateDto);
+        memoService.changeMemo(newUser.getId(), memoUpdateDto);
 
         Memo memo = memoRepository.findByKeyword("newKey").orElse(null);
         Tag tag1 = tagRepository.findByName("tag1").orElse(null);
@@ -244,7 +244,7 @@ class MemoServiceImplTest {
         memoUpdateDto.setTag(map);
 
         Assertions.assertThrows(MemoNotFoundException.class, () ->
-                memoService.changeContentTag(newUser.getId(), memoUpdateDto));
+                memoService.changeMemo(newUser.getId(), memoUpdateDto));
     }
 
     @Test
