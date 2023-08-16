@@ -30,6 +30,7 @@ public class MemoController {
     private final MemoService memoService;
     private final WebService webService;
 
+    // TODO 메모 태그 리스트
     @GetMapping
     public ResponseEntity<String> list(@RequestParam(required = false) String tag, @PageableDefault(size = 12) Pageable pageable, HttpServletRequest request) {
 
@@ -42,6 +43,7 @@ public class MemoController {
         return webService.okResponse(jsonObject);
     }
 
+    // TODO 메모 태그 삭제
     @DeleteMapping
     public ResponseEntity<String> deleteMemo(@RequestBody String keyword, HttpServletRequest request) {
         JsonObject jsonObject = new JsonObject();
@@ -63,6 +65,7 @@ public class MemoController {
         return webService.okResponse(jsonObject);
     }
 
+    // TODO 메모 태그 수정
     @PutMapping
     public ResponseEntity<String> changeMemo(@RequestBody @Valid MemoUpdateDto memoUpdateDto, HttpServletRequest request) {
         /**
@@ -100,10 +103,13 @@ public class MemoController {
         try {
             memoService.write(id, memoWriteDto);
         } catch (DuplicateMemoException e) {
-            log.info("키워드가 같음");
+            log.info("키워드가 같음 = {}", memoWriteDto.getKeyword());
             jsonObject.addProperty("response", Response.DUPLICATE);
             return webService.badResponse(jsonObject);
-        }
+        } catch (UserNotFoundException e) {
+            log.info("유저를 찾을 수 없음 = {}", id);
+            jsonObject.addProperty("response", Response.DUPLICATE);
+            return webService.badResponse(jsonObject);        }
 
         return webService.okResponse(jsonObject);
     }

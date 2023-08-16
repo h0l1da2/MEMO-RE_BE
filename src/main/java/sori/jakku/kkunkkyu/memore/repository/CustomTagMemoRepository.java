@@ -45,24 +45,34 @@ public class CustomTagMemoRepository {
     public void saveTagAndMemo(User user, MemoWriteDto memoWriteDto) {
 
         /**
-         * 태그 없으면 추가, 불러오기
-         * 태그 메모 연결 테이블에 + 메모 후 DB 추가
+         * 태그 있는지 확인 후, 있는데 DB 에 없으면 추가
+         * 메모 추가
+         * 태그메모 추가
          */
-        Memo memo = new Memo(user);
-        memo.writeOnlyKeyword(memoWriteDto.getKeyword());
+        em.merge(user);
+
+        List<Tag> tagList = new ArrayList<>();
+        if (memoWriteDto.getTag() != null) {
+            memoWriteDto.getTag().forEach(
+                    name -> {
+                        Tag newTag = new Tag(user, name);
+                        em.persist(newTag);
+                        tagList.add(newTag);
+                    }
+            );
+        }
+
+        Memo memo = new Memo(user, memoWriteDto.getKeyword());
+
         if (memoWriteDto.getContent() != null) {
             memo.writeOnlyContent(memoWriteDto.getContent());
         }
 
         em.persist(memo);
-        // 태그가 있을 경우, 태그 추가 및 불러오기
-        if (memoWriteDto.getTag() != null) {
-            for (String name : memoWriteDto.getTag()) {
-                Tag tag = new Tag(user, memo,name);
-                    em.persist(tag);
 
-            }
-        }
+        // 태그메모 추가
+        tagList.forEach(tag ->
+                em.persist(new TagMemo(memo, tag)));
 
         em.close();
 

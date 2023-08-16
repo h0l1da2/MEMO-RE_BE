@@ -1,6 +1,8 @@
 package sori.jakku.kkunkkyu.memore.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -17,16 +19,13 @@ public class Memo {
     @JoinColumn(name = "user_id")
     private User user;
 
-    public Memo(User user) {
+    public Memo(User user, String keyword) {
         this.user = user;
+        this.keyword = keyword;
     }
     public void changeMemo(String keyword, String content) {
         this.keyword = keyword;
         this.content = content;
-    }
-
-    public void writeOnlyKeyword(String keyword) {
-        this.keyword = keyword;
     }
 
     public void writeOnlyContent(String content) {

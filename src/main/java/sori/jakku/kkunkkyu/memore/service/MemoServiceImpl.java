@@ -30,16 +30,20 @@ public class MemoServiceImpl implements MemoService {
 
 
     @Override
-    public void write(Long id, MemoWriteDto memoWriteDto) throws DuplicateMemoException {
+    public void write(Long id, MemoWriteDto memoWriteDto) throws DuplicateMemoException, UserNotFoundException {
+        User user = userService.userById(id);
+
+        if (user == null) {
+            throw new UserNotFoundException();
+        }
 
         // 키워드 중복 조사
-        Memo findMemo = memoRepository.findByKeyword(memoWriteDto.getKeyword()).orElse(null);
+        Memo findMemo = memoRepository.findByKeywordAndUser(memoWriteDto.getKeyword(), user).orElse(null);
 
         if (findMemo != null) {
             throw new DuplicateMemoException("중복 메모");
         }
 
-        User user = userService.userById(id);
         // 태그 없으면 추가, 불러오기
         tagMemoRepository.saveTagAndMemo(user, memoWriteDto);
 

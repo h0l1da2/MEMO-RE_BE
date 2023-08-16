@@ -11,7 +11,7 @@ import sori.jakku.kkunkkyu.memore.exception.UserNotFoundException;
 import java.util.List;
 
 public interface MemoService {
-    void write(Long id, MemoWriteDto memoWriteDto) throws DuplicateMemoException;
+    void write(Long id, MemoWriteDto memoWriteDto) throws DuplicateMemoException, UserNotFoundException;
     void changeContentTag(Long id, MemoUpdateDto memoUpdateDto) throws MemoNotFoundException, UserNotFoundException, DuplicateMemoException;
     void removeMemo(Long id, String keyword) throws MemoNotFoundException, UserNotFoundException;
     List<MemoListDto> memoList(Long id, Pageable pageable, String tag);
