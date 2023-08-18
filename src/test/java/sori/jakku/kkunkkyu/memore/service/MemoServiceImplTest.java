@@ -9,9 +9,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 import sori.jakku.kkunkkyu.memore.domain.*;
-import sori.jakku.kkunkkyu.memore.domain.dto.MemoListDto;
 import sori.jakku.kkunkkyu.memore.domain.dto.MemoUpdateDto;
 import sori.jakku.kkunkkyu.memore.domain.dto.MemoWriteDto;
+import sori.jakku.kkunkkyu.memore.domain.dto.TagTagList;
 import sori.jakku.kkunkkyu.memore.exception.DuplicateMemoException;
 import sori.jakku.kkunkkyu.memore.exception.MemoNotFoundException;
 import sori.jakku.kkunkkyu.memore.exception.UserNotFoundException;
@@ -49,7 +49,7 @@ class MemoServiceImplTest {
 
     @Test
     @DisplayName("메모 쓰기 성공 : 모든 값")
-    void 모든값쓰기_성공() throws DuplicateMemoException {
+    void 모든값쓰기_성공() throws DuplicateMemoException, UserNotFoundException {
         User user = new User();
         User newUser = userRepository.save(user);
 
@@ -60,9 +60,9 @@ class MemoServiceImplTest {
 
         memoService.write(newUser.getId(), memoWriteDto);
 
-        Memo memo = memoRepository.findByKeyword(memoWriteDto.getKeyword()).orElse(null);
+        Memo memo = memoRepository.findByKeywordAndUser(memoWriteDto.getKeyword(), newUser).orElse(null);
 
-        Tag tag = tagRepository.findByName(list.get(0)).orElse(null);
+        Tag tag = tagRepository.findByNameAndUser(list.get(0), newUser).orElse(null);
 
         assertThat(memo).isNotNull();
         assertThat(memo.getKeyword()).isEqualTo(memoWriteDto.getKeyword());
@@ -72,7 +72,7 @@ class MemoServiceImplTest {
     }
     @Test
     @DisplayName("메모 쓰기 성공 : 키워드")
-    void 키워드쓰기_성공() throws DuplicateMemoException {
+    void 키워드쓰기_성공() throws DuplicateMemoException, UserNotFoundException {
         User user = new User();
         User newUser = userRepository.save(user);
         MemoWriteDto memoWriteDto = new MemoWriteDto("keyword");
@@ -80,10 +80,10 @@ class MemoServiceImplTest {
         memoService.write(newUser.getId(), memoWriteDto);
 
         // 성공
-        Memo memo = memoRepository.findByKeyword(memoWriteDto.getKeyword()).orElse(null);
+        Memo memo = memoRepository.findByKeywordAndUser(memoWriteDto.getKeyword(), newUser).orElse(null);
 
         // 둘 다 없는 값
-        Tag tag = tagRepository.findByName("noTag").orElse(null);
+        Tag tag = tagRepository.findByNameAndUser("noTag", newUser).orElse(null);
 
         assertThat(memo).isNotNull();
         assertThat(memo.getKeyword()).isEqualTo(memoWriteDto.getKeyword());
@@ -95,7 +95,7 @@ class MemoServiceImplTest {
 
     @Test
     @DisplayName("메모 쓰기 성공 : 키워드, 내용")
-    void 키워드_내용_쓰기_성공() throws DuplicateMemoException {
+    void 키워드_내용_쓰기_성공() throws DuplicateMemoException, UserNotFoundException {
         User user = new User();
         User newUser = userRepository.save(user);
         MemoWriteDto memoWriteDto = new MemoWriteDto("keyword", "content");
@@ -103,10 +103,10 @@ class MemoServiceImplTest {
         memoService.write(newUser.getId(), memoWriteDto);
 
         // 성공
-        Memo memo = memoRepository.findByKeyword(memoWriteDto.getKeyword()).orElse(null);
+        Memo memo = memoRepository.findByKeywordAndUser(memoWriteDto.getKeyword(), newUser).orElse(null);
 
         // 둘 다 없는 값
-        Tag tag = tagRepository.findByName("noTag").orElse(null);
+        Tag tag = tagRepository.findByNameAndUser("noTag", newUser).orElse(null);
 
         assertThat(memo).isNotNull();
         assertThat(memo.getKeyword()).isEqualTo(memoWriteDto.getKeyword());
@@ -118,7 +118,7 @@ class MemoServiceImplTest {
     }
     @Test
     @DisplayName("메모 쓰기 성공 : 키워드, 태그")
-    void 키워드_태그_쓰기_성공() throws DuplicateMemoException {
+    void 키워드_태그_쓰기_성공() throws DuplicateMemoException, UserNotFoundException {
         User user = new User();
         User newUser = userRepository.save(user);
 
@@ -129,9 +129,9 @@ class MemoServiceImplTest {
 
         memoService.write(newUser.getId(), memoWriteDto);
 
-        Memo memo = memoRepository.findByKeyword(memoWriteDto.getKeyword()).orElse(null);
+        Memo memo = memoRepository.findByKeywordAndUser(memoWriteDto.getKeyword(), newUser).orElse(null);
 
-        Tag tag = tagRepository.findByName(list.get(0)).orElse(null);
+        Tag tag = tagRepository.findByNameAndUser(list.get(0), newUser).orElse(null);
 
 
         assertThat(memo).isNotNull();
@@ -146,7 +146,7 @@ class MemoServiceImplTest {
 
     @Test
     @DisplayName("메모 쓰기 실패 : 중복 키워드")
-    void 메모쓰기_키워드중복_실패() throws DuplicateMemoException {
+    void 메모쓰기_키워드중복_실패() throws DuplicateMemoException, UserNotFoundException {
         User user = new User();
         User newUser = userRepository.save(user);
 
@@ -183,9 +183,9 @@ class MemoServiceImplTest {
 
         memoService.changeMemo(newUser.getId(), memoUpdateDto);
 
-        Memo memo = memoRepository.findByKeyword("newKey").orElse(null);
-        Tag tag1 = tagRepository.findByName("tag1").orElse(null);
-        Tag tag2 = tagRepository.findByName("tag2").orElse(null);
+        Memo memo = memoRepository.findByKeywordAndUser("newKey", newUser).orElse(null);
+        Tag tag1 = tagRepository.findByNameAndUser("tag1", newUser).orElse(null);
+        Tag tag2 = tagRepository.findByNameAndUser("tag2", newUser).orElse(null);
 
         assertThat(memo).isNotNull();
         assertThat(memo.getKeyword()).isEqualTo("newKey");
@@ -214,8 +214,8 @@ class MemoServiceImplTest {
 
         memoService.changeMemo(newUser.getId(), memoUpdateDto);
 
-        Memo memo = memoRepository.findByKeyword("newKey").orElse(null);
-        Tag tag1 = tagRepository.findByName("tag1").orElse(null);
+        Memo memo = memoRepository.findByKeywordAndUser("newKey", newUser).orElse(null);
+        Tag tag1 = tagRepository.findByNameAndUser("tag1", newUser).orElse(null);
 
         assertThat(memo).isNotNull();
         assertThat(memo.getKeyword()).isEqualTo("newKey");
@@ -226,7 +226,7 @@ class MemoServiceImplTest {
     }
     @Test
     @DisplayName("메모 수정 실패 : 키워드 실패")
-    void 메모수정_키워드_실패() throws DuplicateMemoException {
+    void 메모수정_키워드_실패() throws DuplicateMemoException, UserNotFoundException {
         User user = new User();
         User newUser = userRepository.save(user);
         List<String> list = new ArrayList<>();
@@ -259,15 +259,15 @@ class MemoServiceImplTest {
 
         memoService.removeMemo(user.getId(), "keyword");
 
-        Memo memo = memoRepository.findByKeyword("keyword").orElse(null);
-        Tag tag = tagRepository.findByName("tag1").orElse(null);
+        Memo memo = memoRepository.findByKeywordAndUser("keyword", newUser).orElse(null);
+        Tag tag = tagRepository.findByNameAndUser("tag1", newUser).orElse(null);
 
         assertThat(memo).isNull();
         assertThat(tag).isNotNull();
     }
     @Test
     @DisplayName("메모 리스트 : 1개")
-    void memoList_one() throws DuplicateMemoException {
+    void memoList_one() throws DuplicateMemoException, UserNotFoundException {
         User user = new User();
         User newUser = userRepository.save(user);
 
@@ -279,12 +279,11 @@ class MemoServiceImplTest {
             memoService.write(newUser.getId(), memoWriteDto);
         }
 
-        List<MemoListDto> memoList = memoService.memoList(user.getId(), PageRequest.of(0, 12), "tag1");
+        List<TagTagList> memoList = memoService.memoList(user.getId(), PageRequest.of(0, 12), "tag1");
         assertThat(memoList.size()).isEqualTo(10);
         for (int i = 0; i < memoList.size(); i++) {
             System.out.println("keyword = " + memoList.get(i).getKeyword());
             System.out.println("content = " + memoList.get(i).getContent());
-            System.out.println("tag = " + memoList.get(i).getTag().get(i));
         }
     }
 }
