@@ -1,5 +1,7 @@
 package sori.jakku.kkunkkyu.memore.repository;
 
+import com.querydsl.core.Tuple;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -8,10 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import sori.jakku.kkunkkyu.memore.domain.*;
-import sori.jakku.kkunkkyu.memore.domain.dto.MemoListDto;
-import sori.jakku.kkunkkyu.memore.domain.dto.MemoUpdateDto;
-import sori.jakku.kkunkkyu.memore.domain.dto.MemoWriteDto;
-import sori.jakku.kkunkkyu.memore.domain.dto.TagDto;
+import sori.jakku.kkunkkyu.memore.domain.dto.*;
 import sori.jakku.kkunkkyu.memore.exception.MemoNotFoundException;
 import sori.jakku.kkunkkyu.memore.exception.UserNotFoundException;
 
@@ -101,16 +100,13 @@ public class CustomTagMemoRepository {
                     if (value == false) {
                         Tag findTag = tagRepository.findByNameAndUser(key, memo.getUser()).orElse(null);
                         if (findTag == null) {
-                            log.info("이미 없는 태그입니다.");
-                            return;
+                            TagMemo findTagMemo = query.select(tagMemo)
+                                    .where(tagMemo.memo.eq(findMemo), tagMemo.tag.isNull())
+                                    .fetchFirst();
+
+                            em.remove(findTagMemo);
+
                         }
-
-                        TagMemo findTagMemo = query.select(tagMemo)
-                                .where(tagMemo.memo.eq(findMemo), tagMemo.tag.eq(findTag))
-                                .fetchFirst();
-
-                        em.remove(findTagMemo);
-
                     }
             });
 
@@ -122,8 +118,8 @@ public class CustomTagMemoRepository {
         findMemo = em.merge(findMemo);
 
         List<TagMemo> tagMemoList = query.select(tagMemo)
-                .where(memo.eq(findMemo))
-                .fetchJoin()
+                .from(tagMemo)
+                .where(tagMemo.memo.in(findMemo))
                 .fetch();
 
         tagMemoList.forEach(tm ->

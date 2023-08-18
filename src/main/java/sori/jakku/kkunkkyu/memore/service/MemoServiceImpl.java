@@ -60,8 +60,12 @@ public class MemoServiceImpl implements MemoService {
             throw new UserNotFoundException("본인 메모가 아닙니다.");
         }
 
-        memoRepository.findByKeywordAndUser(memoUpdateDto.getNewKey(), user)
-                .orElseThrow(DuplicateMemoException::new);
+        Memo findNewKey = memoRepository.findByKeywordAndUser(memoUpdateDto.getNewKey(), user).orElse(null);
+
+        if (findNewKey != null) {
+            throw new DuplicateMemoException();
+        }
+
         tagMemoRepository.updateMemoAndTag(memo, memoUpdateDto);
 
     }
