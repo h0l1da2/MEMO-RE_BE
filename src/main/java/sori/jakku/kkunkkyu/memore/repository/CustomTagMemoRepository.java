@@ -51,6 +51,14 @@ public class CustomTagMemoRepository {
          */
         em.merge(user);
 
+        Memo memo = new Memo(user, memoWriteDto.getKeyword());
+
+        if (memoWriteDto.getContent() != null) {
+            memo.writeOnlyContent(memoWriteDto.getContent());
+        }
+
+        em.persist(memo);
+
         List<Tag> tagList = new ArrayList<>();
         if (memoWriteDto.getTag() != null) {
             memoWriteDto.getTag().forEach(
@@ -61,14 +69,6 @@ public class CustomTagMemoRepository {
                     }
             );
         }
-
-        Memo memo = new Memo(user, memoWriteDto.getKeyword());
-
-        if (memoWriteDto.getContent() != null) {
-            memo.writeOnlyContent(memoWriteDto.getContent());
-        }
-
-        em.persist(memo);
 
         // 태그메모 추가
         tagList.forEach(tag ->
@@ -116,6 +116,7 @@ public class CustomTagMemoRepository {
 
     }
 
+    @Transactional
     public void deleteMemo(Memo findMemo) {
         // 태그메모, 메모 삭제
         findMemo = em.merge(findMemo);
@@ -131,37 +132,74 @@ public class CustomTagMemoRepository {
     }
 
     public List<MemoListDto> findAllForList(Long id, Pageable pageable, String name) {
-
-        List<Memo> memoList = query.select(memo)
-                .from(memo, tag)
-                .where(tag.name.eq(name), tag.memo.user.id.eq(id))
-                .orderBy(tag.memo.id.desc())
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
-
+        /**
+         * 태그, 태그메모로 메모 가져오기
+         * 그걸로 태그 가져오기 !
+         */
         List<MemoListDto> list = new ArrayList<>();
 
+        // 태그가 null 이 아니라면
         if (name != null) {
-            List<Tag> tagList = query.select(tag)
-                    .from(tag)
-                    .where(tag.memo.in(memoList))
-                    .orderBy(tag.memo.id.desc())
+
+            List<Memo> memoList = query.select(memo)
+                    .from(memo, tag, tagMemo)
+                    // 메모->유저, 메모태그->메모, 태그->태그이름
+                    .where(memo.user.id.eq(id), tagMemo.memo.in(memo), tag.name.eq(name))
+                    .orderBy(memo.id.desc())
+                    .offset(pageable.getOffset())
+                    .limit(pageable.getPageSize())
+                    .fetchJoin()
                     .fetch();
+
+            List<TagMemo> tagMemoList = query.select(tagMemo)
+                    .from(memo, tag, tagMemo)
+                    // 메모->유저, 메모태그->메모, 태그->태그이름
+                    .where(memo.user.id.eq(id), tagMemo.memo.in(memo), tag.name.eq(name))
+                    .orderBy(memo.id.desc())
+                    .offset(pageable.getOffset())
+                    .limit(pageable.getPageSize())
+                    .fetchJoin()
+                    .fetch();
+
+            List<Tag> tagList = query.select(tag)
+                    .from(tag, tagMemo)
+                    .where(tag.user.id.eq(id), tag.name.eq(name), tagMemo.memo.in(memoList))
+                    .orderBy(tag.id.desc())
+                    .fetchJoin()
+                    .fetch();
+
             List<String> tags = new ArrayList<>();
-            for (Memo memo : memoList) {
-                for (Tag tag : tagList) {
-                    if (memo == tag.getMemo()) {
-                        tags.add(tag.getName());
-                    }
-                }
-                list.add(new MemoListDto(memo.getKeyword(), memo.getContent(), tags));
-            }
+
+            // 메모태그 리스트들을 가져와 반복으로 돌려서
+            // 태그메모가 가진 메모와 태그가 동일한 걸 찾아서 안에 넣음
+            tagMemoList.forEach(tm -> {
+                memoList.forEach(m -> {
+                    tagList.forEach(t -> {
+                        if (tm.getMemo() == m && tm.getTag() == t) {
+                            tags.add(t.getName());
+                        }
+                    });
+                    list.add(new MemoListDto(m.getKeyword(), m.getContent(), tags));
+                });
+            });
         }
+        // 모든 태그 없음
         if (name == null) {
-            for (Memo memo : memoList) {
-                list.add(new MemoListDto(memo.getKeyword(), memo.getContent()));
-            }
+
+            List<Memo> memoList = query.select(memo)
+                    .from(memo, tag)
+                    // 메모->유저, 메모태그->메모, 태그->태그이름
+                    .where(memo.user.id.eq(id), tag.name.isNull())
+                    .groupBy(memo.user, tag.user)
+                    .orderBy(memo.id.desc())
+                    .offset(pageable.getOffset())
+                    .limit(pageable.getPageSize())
+                    .fetchJoin()
+                    .fetch();
+
+            memoList.forEach(m -> {
+                list.add(new MemoListDto(m.getKeyword(), m.getContent()));
+            });
         }
 
         return list;

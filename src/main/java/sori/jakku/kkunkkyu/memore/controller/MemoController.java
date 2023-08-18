@@ -30,7 +30,6 @@ public class MemoController {
     private final MemoService memoService;
     private final WebService webService;
 
-    // TODO 메모 태그 리스트
     @GetMapping
     public ResponseEntity<String> list(@RequestParam(required = false) String tag, @PageableDefault(size = 12) Pageable pageable, HttpServletRequest request) {
 
