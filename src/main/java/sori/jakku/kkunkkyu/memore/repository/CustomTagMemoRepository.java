@@ -96,20 +96,38 @@ public class CustomTagMemoRepository {
                     if (value == true) {
                         Tag tag = tagRepository.findByNameAndUser(key, memo.getUser()).orElse(null);
                         if (tag == null) {
-                            tag = tagRepository.save(new Tag(memo.getUser(), key));
+                            tag = new Tag(memo.getUser(), key);
+                            em.persist(tag);
                         }
                         em.persist(new TagMemo(findMemo, tag));
                     }
                     // 없애는 태그
                     if (value == false) {
                         Tag findTag = tagRepository.findByNameAndUser(key, memo.getUser()).orElse(null);
+
+                        TagMemo findTagMemo = null;
+
                         if (findTag == null) {
-                            TagMemo findTagMemo = query.select(tagMemo)
+
+                            findTagMemo = query
+                                    .select(tagMemo)
                                     .where(tagMemo.memo.eq(findMemo), tagMemo.tag.isNull())
                                     .fetchFirst();
 
-                            em.remove(findTagMemo);
+                        }
 
+                        if (findTag != null) {
+
+                            findTagMemo = query
+                                    .select(tagMemo)
+                                    .where(tagMemo.memo.eq(findMemo), tagMemo.tag.isNotNull())
+                                    .fetchFirst();
+
+                        }
+
+                        if (findTagMemo != null) {
+                            log.info("해당 태그 메모 삭제");
+                            em.remove(findTagMemo);
                         }
                     }
             });
