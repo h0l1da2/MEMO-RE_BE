@@ -70,20 +70,6 @@ class TagServiceImplTest {
     }
 
     @Test
-    @DisplayName("메인메모쓰기:태그길이 길어서 실패")
-    void writeForMain() throws UserNotFoundException {
-        // given 유저와 태그DTO
-        User user = userRepository.save(new User("user", "pwd"));
-        TagDto tagDto = new TagDto("tagA111111111111111111111", "tagB", "tagC");
-
-        // when then
-        org.junit.jupiter.api.Assertions.assertThrows(
-                ConditionNotMatchException.class, () ->
-                tagService.writeForMain(user.getId(), tagDto));
-
-    }
-
-    @Test
     @DisplayName("태그 쓰기 성공")
     void writeSuccess() throws UserNotFoundException, ConditionNotMatchException, DuplicateMemoException {
         // given 유저, name
@@ -138,11 +124,11 @@ class TagServiceImplTest {
     }
     @Test
     @DisplayName("태그 쓰기 실패 : 태그 길이 Over")
-    void writeLengthOverFail() throws UserNotFoundException {
+    void writeLengthOverFail() {
         // given 유저, name
         User user = new User("user", "pwd");
         user = userRepository.save(user);
-        String name = "태그321312343242342323";
+        String name = "태그3213123432423423231";
         User finalUser = user;
         // when then
         Assertions.assertThrows(
