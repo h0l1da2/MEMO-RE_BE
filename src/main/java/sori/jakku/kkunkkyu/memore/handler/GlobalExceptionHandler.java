@@ -1,4 +1,4 @@
-package sori.jakku.kkunkkyu.memore.controller;
+package sori.jakku.kkunkkyu.memore.handler;
 
 import com.google.gson.JsonObject;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +17,7 @@ import sori.jakku.kkunkkyu.memore.service.inter.WebService;
 @Slf4j
 @ControllerAdvice
 @RequiredArgsConstructor
-public class ExceptionController {
+public class GlobalExceptionHandler {
 
     private final WebService webService;
 

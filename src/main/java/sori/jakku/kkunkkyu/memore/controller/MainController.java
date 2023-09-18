@@ -27,7 +27,7 @@ public class MainController {
 
     // 메인 페이지는 3개의 태그를 저장한다.
     @PostMapping
-    public ResponseEntity<String> tagMain(@RequestBody @Valid TagDto tagDto, HttpServletRequest request) {
+    public ResponseEntity<String> tagMain(@RequestBody @Valid TagDto tagDto, HttpServletRequest request) throws UserNotFoundException {
         JsonObject jsonObject = new JsonObject();
 
         /**
@@ -36,19 +36,8 @@ public class MainController {
          * 태그 값을 응답에 추가 (그래야 본인 페이지로 갔을 때, 그 값들을 보여줄 수 있을듯)
          */
         Long id = webService.getIdInHeader(request);
-
-        try {
-
-            String tagJson = tagService.writeForMain(id, tagDto);
-            jsonObject.addProperty("tag", tagJson);
-
-        } catch (UserNotFoundException e) {
-
-            log.error("헤더에 들어있는 id 가 진짜 id 가 아니었다 Id = {}", id);
-            jsonObject.addProperty("response", Response.USER_NOT_FOUND);
-            return webService.badResponse(jsonObject);
-
-        }
+        String tagJson = tagService.writeForMain(id, tagDto);
+        jsonObject.addProperty("tag", tagJson);
 
         return webService.okResponse(jsonObject);
     }

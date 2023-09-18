@@ -29,31 +29,18 @@ public class UserSignUpController {
      * 회원 가입
      */
     @PostMapping("/usernameValid")
-    public ResponseEntity<String> usernameValid(@RequestBody String username) {
+    public ResponseEntity<String> usernameValid(@RequestBody String username) throws UsernameDuplException {
         boolean valid = false;
-        JsonObject jsonObject = new JsonObject();
-        try {
-            valid = userService.usernameDupl(username);
-        } catch (UsernameDuplException e) {
-            jsonObject.addProperty("response", Response.USERNAME_DUPL);
-            return webService.badResponse(jsonObject);
-        }
+
+        valid = userService.usernameDupl(username);
         return validResponse(valid);
     }
 
     @PostMapping("/signUp")
-    public ResponseEntity<String> signUp(@RequestBody @Valid UserDto userDto) {
+    public ResponseEntity<String> signUp(@RequestBody @Valid UserDto userDto) throws UsernameDuplException {
         JsonObject jsonObject = new JsonObject();
-        try {
 
-            userService.signUp(userDto);
-
-        } catch (UsernameDuplException e) {
-
-            jsonObject.addProperty("response", Response.USERNAME_DUPL);
-            return webService.badResponse(jsonObject);
-
-        }
+        userService.signUp(userDto);
 
         return webService.okResponse(jsonObject);
     }

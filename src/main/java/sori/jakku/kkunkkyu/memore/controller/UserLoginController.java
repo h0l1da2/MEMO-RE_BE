@@ -1,7 +1,6 @@
 package sori.jakku.kkunkkyu.memore.controller;
 
 import com.google.gson.JsonObject;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -12,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import sori.jakku.kkunkkyu.memore.config.jwt.TokenService;
 import sori.jakku.kkunkkyu.memore.domain.User;
-import sori.jakku.kkunkkyu.memore.domain.dto.Response;
 import sori.jakku.kkunkkyu.memore.domain.dto.UserDto;
 import sori.jakku.kkunkkyu.memore.service.inter.UserService;
 import sori.jakku.kkunkkyu.memore.service.inter.WebService;
@@ -33,7 +31,7 @@ public class UserLoginController {
     private final TokenService tokenService;
 
     @PostMapping
-    public ResponseEntity<String> login(@RequestBody @Valid UserDto userDto, HttpServletRequest request) {
+    public ResponseEntity<String> login(@RequestBody @Valid UserDto userDto) throws LoginException {
 
         /**
          * 아이디 비밀번호 확인
@@ -44,18 +42,13 @@ public class UserLoginController {
 
         JsonObject jsonObject = new JsonObject();
 
-        try {
-            // 아이디 비밀번호 확인
-            User user = userService.login(userDto);
+        // 아이디 비밀번호 확인
+        User user = userService.login(userDto);
 
-            // 토큰 생성
-            String token = tokenService.creatToken(user.getId(), user.getUsername());
-            jsonObject.addProperty("token", token);
+        // 토큰 생성
+        String token = tokenService.creatToken(user.getId(), user.getUsername());
+        jsonObject.addProperty("token", token);
 
-        } catch (LoginException e) {
-            jsonObject.addProperty("response", Response.LOGIN_FAIL);
-            return webService.badResponse(jsonObject);
-        }
 
         return webService.okResponse(jsonObject);
     }
