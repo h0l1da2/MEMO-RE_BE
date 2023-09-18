@@ -50,15 +50,21 @@ public class CustomTagMemoRepository {
 
         Memo memo = new Memo(user, memoWriteDto.getKeyword());
 
-        if (memoWriteDto.getContent() != null) {
+        String memoContent = memoWriteDto.getContent();
+
+        if (memoContent != null) {
             memo.writeOnlyContent(memoWriteDto.getContent());
         }
 
         em.persist(memo);
 
         List<Tag> tagList = new ArrayList<>();
-        if (memoWriteDto.getTag() != null) {
-            memoWriteDto.getTag().forEach(
+
+        List<String> dtoTagList = memoWriteDto.getTag();
+
+        if (dtoTagList.size() != 0) {
+
+            memoWriteDto.getTag().stream().forEach(
                     name -> {
                         Tag newTag = new Tag(user, name);
                         em.persist(newTag);
@@ -68,7 +74,7 @@ public class CustomTagMemoRepository {
         }
 
         // 태그메모 추가
-        tagList.forEach(tag ->
+        tagList.stream().forEach(tag ->
                 em.persist(new TagMemo(memo, tag)));
 
         em.close();
