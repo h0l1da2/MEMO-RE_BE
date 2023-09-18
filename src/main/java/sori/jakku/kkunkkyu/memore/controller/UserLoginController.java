@@ -2,7 +2,6 @@ package sori.jakku.kkunkkyu.memore.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,7 +18,6 @@ import javax.security.auth.login.LoginException;
 /**
  * 회원가입
  */
-@Log4j2
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/login")

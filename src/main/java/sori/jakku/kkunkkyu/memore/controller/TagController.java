@@ -2,7 +2,6 @@ package sori.jakku.kkunkkyu.memore.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sori.jakku.kkunkkyu.memore.domain.dto.TagWriteDto;
@@ -15,7 +14,6 @@ import sori.jakku.kkunkkyu.memore.web.Response;
 
 import java.util.List;
 
-@Slf4j
 @RestController
 @RequestMapping("/tag")
 @RequiredArgsConstructor
