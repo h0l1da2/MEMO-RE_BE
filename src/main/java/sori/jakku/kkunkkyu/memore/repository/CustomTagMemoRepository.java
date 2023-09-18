@@ -1,5 +1,6 @@
 package sori.jakku.kkunkkyu.memore.repository;
 
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -149,58 +150,36 @@ public class CustomTagMemoRepository {
          * 태그, 태그메모로 메모 가져오기
          * 그걸로 태그 가져오기 !
          */
-        List<MemoListDto> list = new ArrayList<>();
+        List<MemoListDto> memoTagList = new ArrayList<>();
 
         // 태그가 null 이 아니라면
         if (name != null) {
 
-            List<Memo> memoList = query.select(memo)
-                    .from(memo, tag, tagMemo)
-                    // 메모->유저, 메모태그->메모, 태그->태그이름
-                    .where(memo.user.id.eq(id), tagMemo.memo.in(memo), tag.user.id.eq(id), tag.name.eq(name))
+            memoTagList = query.select(Projections.constructor(MemoListDto.class,
+                    memo.keyword, memo.content, tag.name))
+                    .from(tagMemo)
+                    .leftJoin(tagMemo.memo, memo)
+                    .leftJoin(tagMemo.tag, tag)
+                    .where(tag.name.eq(name))
+                    .groupBy(memo.user, tag.user)
                     .orderBy(memo.id.desc())
                     .offset(pageable.getOffset())
                     .limit(pageable.getPageSize())
                     .fetchJoin()
                     .fetch();
-
-            List<TagMemo> tagMemoList = query.select(tagMemo)
-                    .from(memo, tag, tagMemo)
-                    // 메모->유저, 메모태그->메모, 태그->태그이름
-                    .where(memo.user.id.eq(id), tagMemo.memo.in(memo), tag.name.eq(name))
-                    .orderBy(memo.id.desc())
-                    .offset(pageable.getOffset())
-                    .limit(pageable.getPageSize())
-                    .fetchJoin()
-                    .fetch();
-
-            List<Tag> tagList = query.select(tag)
-                    .from(tag, tagMemo)
-                    .where(tag.user.id.eq(id), tag.name.eq(name), tagMemo.memo.in(memoList))
-                    .orderBy(tag.id.desc())
-                    .fetchJoin()
-                    .fetch();
-
-            List<String> tags = new ArrayList<>();
 
             // 메모태그 리스트들을 가져와 반복으로 돌려서
             // 태그메모가 가진 메모와 태그가 동일한 걸 찾아서 안에 넣음
-            tagMemoList.stream().forEach(tm -> {
-                memoList.forEach(m -> {
-                    tagList.forEach(t -> {
-                        if (tm.getMemo() == m && tm.getTag() == t) {
-                            tags.add(t.getName());
-                        }
-                    });
-                    list.add(new MemoListDto(m.getKeyword(), m.getContent(), tags));
-                });
-            });
+
         }
         // 모든 태그 없음
         if (name == null) {
 
-            List<Memo> memoList = query.select(memo)
-                    .from(memo, tag)
+            memoTagList = query.select(Projections.constructor(MemoListDto.class,
+                            memo.keyword, memo.content, tag.name))
+                    .from(tagMemo)
+                    .leftJoin(tagMemo.memo, memo)
+                    .leftJoin(tagMemo.tag, tag)
                     // 메모->유저, 메모태그->메모, 태그->태그이름
                     .where(memo.user.id.eq(id), tag.name.isNull())
                     .groupBy(memo.user, tag.user)
@@ -210,12 +189,9 @@ public class CustomTagMemoRepository {
                     .fetchJoin()
                     .fetch();
 
-            memoList.forEach(m -> {
-                list.add(new MemoListDto(m.getKeyword(), m.getContent()));
-            });
         }
 
-        return list;
+        return memoTagList;
 
     }
 
