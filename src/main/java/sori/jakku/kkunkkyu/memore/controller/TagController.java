@@ -1,10 +1,12 @@
 package sori.jakku.kkunkkyu.memore.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sori.jakku.kkunkkyu.memore.domain.dto.TagWriteDto;
+import sori.jakku.kkunkkyu.memore.exception.ConditionNotMatchException;
 import sori.jakku.kkunkkyu.memore.exception.DuplicateMemoException;
 import sori.jakku.kkunkkyu.memore.exception.MemoNotFoundException;
 import sori.jakku.kkunkkyu.memore.exception.UserNotFoundException;
@@ -33,7 +35,7 @@ public class TagController {
     }
 
     @DeleteMapping
-    public ResponseEntity<Response> delete(@RequestBody TagWriteDto tagWriteDto, HttpServletRequest request) throws UserNotFoundException, MemoNotFoundException {
+    public ResponseEntity<Response> delete(@RequestBody @Valid TagWriteDto tagWriteDto, HttpServletRequest request) throws UserNotFoundException, MemoNotFoundException {
         Long id = webService.getIdInHeader(request);
 
         tagService.deleteTag(id, tagWriteDto);
@@ -42,7 +44,7 @@ public class TagController {
     }
 
     @PostMapping
-    public ResponseEntity<Response> write(@RequestBody TagWriteDto tagWriteDto, HttpServletRequest request) throws UserNotFoundException, DuplicateMemoException {
+    public ResponseEntity<Response> write(@RequestBody @Valid TagWriteDto tagWriteDto, HttpServletRequest request) throws UserNotFoundException, DuplicateMemoException, ConditionNotMatchException {
 
         Long id = webService.getIdInHeader(request);
 

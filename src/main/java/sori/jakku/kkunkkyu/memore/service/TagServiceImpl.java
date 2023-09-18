@@ -7,6 +7,7 @@ import sori.jakku.kkunkkyu.memore.domain.Tag;
 import sori.jakku.kkunkkyu.memore.domain.User;
 import sori.jakku.kkunkkyu.memore.domain.dto.TagDto;
 import sori.jakku.kkunkkyu.memore.domain.dto.TagWriteDto;
+import sori.jakku.kkunkkyu.memore.exception.ConditionNotMatchException;
 import sori.jakku.kkunkkyu.memore.exception.DuplicateMemoException;
 import sori.jakku.kkunkkyu.memore.exception.MemoNotFoundException;
 import sori.jakku.kkunkkyu.memore.exception.UserNotFoundException;
@@ -49,10 +50,18 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public String writeTag(Long id, String name) throws UserNotFoundException, DuplicateMemoException {
+    public String writeTag(Long id, String name) throws UserNotFoundException, DuplicateMemoException, ConditionNotMatchException {
         /**
          * 유저 찾고 이름 검증 후, 태그 생성 및 DB INSERT
          */
+
+        if (name == null || name.isBlank()
+                || name.length() > 20
+                || !name.matches(".*[ㄱ-ㅎㅏ-ㅣ가-힣a-zA-Z\\d+.]+.*")) {
+            log.error("태그 이름 형식 다름 = {}", name);
+            throw new ConditionNotMatchException("태그 이름 형식이 맞지 않음");
+        }
+
         User user = userService.userById(id);
         if (user == null) {
             log.error("id 에 해당하는 유저 없음 = {}", id);
