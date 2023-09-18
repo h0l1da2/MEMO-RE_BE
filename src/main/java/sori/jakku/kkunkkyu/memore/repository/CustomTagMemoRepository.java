@@ -1,5 +1,6 @@
 package sori.jakku.kkunkkyu.memore.repository;
 
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
@@ -61,12 +62,16 @@ public class CustomTagMemoRepository {
 
         List<Tag> tagList = new ArrayList<>();
 
-        memoWriteDto.getTag().stream().forEach(
+        List<String> dtoTagList = memoWriteDto.getTag();
+
+        if (dtoTagList != null) {
+            dtoTagList.stream().forEach(
                     name -> {
                         Tag newTag = new Tag(user, name);
                         em.persist(newTag);
                         tagList.add(newTag);
                     });
+        }
 
         // 태그메모 추가
         tagList.stream().forEach(tag ->
@@ -106,6 +111,7 @@ public class CustomTagMemoRepository {
 
                             findTagMemo = query
                                     .select(tagMemo)
+                                    .from(tagMemo)
                                     .where(tagMemo.memo.eq(findMemo), tagMemo.tag.isNull())
                                     .fetchFirst();
 
@@ -115,6 +121,7 @@ public class CustomTagMemoRepository {
 
                             findTagMemo = query
                                     .select(tagMemo)
+                                    .from(tagMemo)
                                     .where(tagMemo.memo.eq(findMemo), tagMemo.tag.isNotNull())
                                     .fetchFirst();
 
@@ -150,22 +157,19 @@ public class CustomTagMemoRepository {
          * 태그, 태그메모로 메모 가져오기
          * 그걸로 태그 가져오기 !
          */
-        List<MemoListDto> memoTagList = new ArrayList<>();
+        List<Tuple> tupleMemoTagList = new ArrayList<>();
 
         // 태그가 null 이 아니라면
         if (name != null) {
 
-            memoTagList = query.select(Projections.constructor(MemoListDto.class,
-                    memo.keyword, memo.content, tag.name))
+            tupleMemoTagList = query.select(memo.keyword, memo.content, tag.name)
                     .from(tagMemo)
                     .leftJoin(tagMemo.memo, memo)
                     .leftJoin(tagMemo.tag, tag)
-                    .where(tag.name.eq(name))
-                    .groupBy(memo.user, tag.user)
+                    .where(memo.user.id.eq(id), tag.name.eq(name))
                     .orderBy(memo.id.desc())
                     .offset(pageable.getOffset())
                     .limit(pageable.getPageSize())
-                    .fetchJoin()
                     .fetch();
 
             // 메모태그 리스트들을 가져와 반복으로 돌려서
@@ -175,23 +179,35 @@ public class CustomTagMemoRepository {
         // 모든 태그 없음
         if (name == null) {
 
-            memoTagList = query.select(Projections.constructor(MemoListDto.class,
-                            memo.keyword, memo.content, tag.name))
+            tupleMemoTagList = query.select(memo.keyword, memo.content, tag.name)
                     .from(tagMemo)
                     .leftJoin(tagMemo.memo, memo)
                     .leftJoin(tagMemo.tag, tag)
                     // 메모->유저, 메모태그->메모, 태그->태그이름
                     .where(memo.user.id.eq(id), tag.name.isNull())
-                    .groupBy(memo.user, tag.user)
                     .orderBy(memo.id.desc())
                     .offset(pageable.getOffset())
                     .limit(pageable.getPageSize())
-                    .fetchJoin()
                     .fetch();
 
         }
+        List<MemoListDto> resultMemoTagList = new ArrayList<>();
 
-        return memoTagList;
+        for (Tuple tuple : tupleMemoTagList) {
+            String keyword = tuple.get(memo.keyword);
+            String content = tuple.get(memo.content);
+            String tag = tuple.get(QTag.tag.name);
+
+            // MemoListDto 객체 생성 및 리스트에 추가
+            MemoListDto dto = MemoListDto.builder()
+                    .keyword(keyword)
+                    .content(content)
+                    .build();
+            dto.getTag().add(tag);
+            resultMemoTagList.add(dto);
+        }
+
+        return resultMemoTagList;
 
     }
 
