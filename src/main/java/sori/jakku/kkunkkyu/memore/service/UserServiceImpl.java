@@ -1,7 +1,7 @@
 package sori.jakku.kkunkkyu.memore.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -16,7 +16,7 @@ import javax.security.auth.login.LoginException;
 
 @Service
 @RequiredArgsConstructor
-@Log4j2
+@Slf4j
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
@@ -41,7 +41,8 @@ public class UserServiceImpl implements UserService {
         // 아이디 중복 검증
         User user = userRepository.findByUsername(username);
         if (user != null) {
-            throw new UsernameDuplException();
+            log.error("아이디 중복 = {}", username);
+            throw new UsernameDuplException("아이디가 중복입니다.");
         }
 
         return true;
@@ -52,7 +53,8 @@ public class UserServiceImpl implements UserService {
 
         User findUser = userRepository.findByUsername(userDto.getUsername());
         if (findUser != null) {
-            throw new UsernameDuplException();
+            log.error("아이디 중복 = {}", findUser.getUsername());
+            throw new UsernameDuplException("아이디가 중복입니다.");
         }
 
         userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
@@ -65,12 +67,14 @@ public class UserServiceImpl implements UserService {
 
         User findUser = userRepository.findByUsername(userDto.getUsername());
         if (findUser == null) {
-            throw new LoginException("유저 이름 찾을 수 없음");
+            log.error("유저를 찾을 수 없음 = {}", userDto.getUsername());
+            throw new LoginException("유저 이름을 찾을 수 없습니다.");
         }
 
         boolean matches = passwordEncoder.matches(userDto.getPassword(), findUser.getPassword());
         if (!matches) {
-            throw new LoginException("비밀번호 다름");
+            log.error("비밀번호가 다름 = {}", findUser.getPassword());
+            throw new LoginException("비밀번호가 다릅니다.");
         }
 
         return findUser;

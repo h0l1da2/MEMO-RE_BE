@@ -34,13 +34,15 @@ public class MemoServiceImpl implements MemoService {
         User user = userService.userById(id);
 
         if (user == null) {
-            throw new UserNotFoundException();
+            log.error("유저 찾을 수 없음 = {}", id);
+            throw new UserNotFoundException("유저를 찾을 수 없습니다.");
         }
 
         // 키워드 중복 조사
         Memo findMemo = memoRepository.findByKeywordAndUser(memoWriteDto.getKeyword(), user).orElse(null);
 
         if (findMemo != null) {
+            log.error("메모가 중복 = {}", memoWriteDto.getKeyword());
             throw new DuplicateMemoException("중복 메모");
         }
 
@@ -57,13 +59,15 @@ public class MemoServiceImpl implements MemoService {
                 .orElseThrow(MemoNotFoundException::new);
 
         if (memo.getUser() != user) {
+            log.error("본인 메모가 아님 메모 아이디 = {}, 로그인 아이디 = {}", memo.getUser().getId(), id);
             throw new UserNotFoundException("본인 메모가 아닙니다.");
         }
 
         Memo findNewKey = memoRepository.findByKeywordAndUser(memoUpdateDto.getNewKey(), user).orElse(null);
 
         if (findNewKey != null) {
-            throw new DuplicateMemoException();
+            log.error("메모 키워드가 중복 = {}", findNewKey.getKeyword());
+            throw new DuplicateMemoException("바꿀 메모가 중복 메모입니다.");
         }
 
         tagMemoRepository.updateMemoAndTag(memo, memoUpdateDto);
@@ -78,6 +82,7 @@ public class MemoServiceImpl implements MemoService {
                 .orElseThrow(MemoNotFoundException::new);
 
         if (memo.getUser() != user) {
+            log.error("본인 메모가 아닙니다. 메모 유저 = {}, 로그인 유저 = {}", user.getId(), id);
             throw new UserNotFoundException("본인 메모가 아닙니다.");
         }
         // 메모태그 레코드 다 지우고

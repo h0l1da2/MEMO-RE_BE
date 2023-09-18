@@ -1,7 +1,5 @@
 package sori.jakku.kkunkkyu.memore.repository;
 
-import com.querydsl.core.Tuple;
-import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -140,7 +138,7 @@ public class CustomTagMemoRepository {
             List<Memo> memoList = query.select(memo)
                     .from(memo, tag, tagMemo)
                     // 메모->유저, 메모태그->메모, 태그->태그이름
-                    .where(memo.user.id.eq(id), tagMemo.memo.in(memo), tag.name.eq(name))
+                    .where(memo.user.id.eq(id), tagMemo.memo.in(memo), tag.user.id.eq(id), tag.name.eq(name))
                     .orderBy(memo.id.desc())
                     .offset(pageable.getOffset())
                     .limit(pageable.getPageSize())
@@ -205,13 +203,15 @@ public class CustomTagMemoRepository {
     public void deleteTag(Long id, String name) throws MemoNotFoundException, UserNotFoundException {
         User user = em.find(User.class, id);
         if (user == null) {
-            throw new UserNotFoundException();
+            log.error("유저가 없음 = {}", id);
+            throw new UserNotFoundException("유저가 없습니다.");
         }
 
         Tag findTag = tagRepository.findByNameAndUser(name, user).orElse(null);
 
         if (findTag == null) {
-            throw new MemoNotFoundException();
+            log.error("해당 태그는 없음 = {}", name);
+            throw new MemoNotFoundException("해당 메모는 없습니다.");
         }
 
         em.remove(findTag);

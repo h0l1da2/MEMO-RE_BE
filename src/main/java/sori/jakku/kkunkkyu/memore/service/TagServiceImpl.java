@@ -39,7 +39,8 @@ public class TagServiceImpl implements TagService {
 
         User user = userService.userById(id);
         if (user == null) {
-            throw new UserNotFoundException("유저가 없음");
+            log.error("id 에 해당하는 유저 없음 = {}", id);
+            throw new UserNotFoundException("유저가 없습니다.");
         }
 
         tagMemoRepository.saveTagMain(user, tagDto);
@@ -54,13 +55,15 @@ public class TagServiceImpl implements TagService {
          */
         User user = userService.userById(id);
         if (user == null) {
-            throw new UserNotFoundException();
+            log.error("id 에 해당하는 유저 없음 = {}", id);
+            throw new UserNotFoundException("유저가 없습니다.");
         }
 
         Tag findTag = tagRepository.findByNameAndUser(name, user).orElse(null);
 
         if (findTag != null) {
-            throw new DuplicateMemoException("태그 중복");
+            log.error("태그 중복 = {}", name);
+            throw new DuplicateMemoException("태그가 중복입니다.");
         }
 
         Tag tag = tagRepository.save(new Tag(user, name));
@@ -78,7 +81,8 @@ public class TagServiceImpl implements TagService {
         User user = userService.userById(id);
 
         if (user == null) {
-            throw new UserNotFoundException();
+            log.error("id 에 해당하는 유저 없음 = {}", id);
+            throw new UserNotFoundException("유저가 없습니다.");
         }
 
         return tagMemoRepository.findAllTag(id);
