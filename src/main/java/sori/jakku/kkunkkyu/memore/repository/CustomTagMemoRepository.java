@@ -60,18 +60,12 @@ public class CustomTagMemoRepository {
 
         List<Tag> tagList = new ArrayList<>();
 
-        List<String> dtoTagList = memoWriteDto.getTag();
-
-        if (dtoTagList.size() != 0) {
-
-            memoWriteDto.getTag().stream().forEach(
+        memoWriteDto.getTag().stream().forEach(
                     name -> {
                         Tag newTag = new Tag(user, name);
                         em.persist(newTag);
                         tagList.add(newTag);
-                    }
-            );
-        }
+                    });
 
         // 태그메모 추가
         tagList.stream().forEach(tag ->
@@ -144,8 +138,9 @@ public class CustomTagMemoRepository {
                 .where(tagMemo.memo.in(findMemo))
                 .fetch();
 
-        tagMemoList.forEach(tm ->
-                em.remove(tm));
+            tagMemoList.stream().forEach(tm ->
+                    em.remove(tm));
+
         em.remove(findMemo);
     }
 
@@ -190,7 +185,7 @@ public class CustomTagMemoRepository {
 
             // 메모태그 리스트들을 가져와 반복으로 돌려서
             // 태그메모가 가진 메모와 태그가 동일한 걸 찾아서 안에 넣음
-            tagMemoList.forEach(tm -> {
+            tagMemoList.stream().forEach(tm -> {
                 memoList.forEach(m -> {
                     tagList.forEach(t -> {
                         if (tm.getMemo() == m && tm.getTag() == t) {
