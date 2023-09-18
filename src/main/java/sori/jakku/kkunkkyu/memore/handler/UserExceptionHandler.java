@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import sori.jakku.kkunkkyu.memore.exception.UserNotFoundException;
 import sori.jakku.kkunkkyu.memore.exception.UsernameDuplException;
-import sori.jakku.kkunkkyu.web.Response;
+import sori.jakku.kkunkkyu.memore.web.Response;
 
 import javax.security.auth.login.LoginException;
 

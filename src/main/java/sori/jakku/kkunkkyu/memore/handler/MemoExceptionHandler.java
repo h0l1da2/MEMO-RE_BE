@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import sori.jakku.kkunkkyu.memore.exception.DuplicateMemoException;
 import sori.jakku.kkunkkyu.memore.exception.MemoNotFoundException;
-import sori.jakku.kkunkkyu.web.Response;
+import sori.jakku.kkunkkyu.memore.web.Response;
 
 @ControllerAdvice
 public class MemoExceptionHandler {
