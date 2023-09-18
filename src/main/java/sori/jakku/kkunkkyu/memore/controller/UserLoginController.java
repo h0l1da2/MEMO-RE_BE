@@ -1,6 +1,5 @@
 package sori.jakku.kkunkkyu.memore.controller;
 
-import com.google.gson.JsonObject;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -13,7 +12,7 @@ import sori.jakku.kkunkkyu.memore.config.jwt.TokenService;
 import sori.jakku.kkunkkyu.memore.domain.User;
 import sori.jakku.kkunkkyu.memore.domain.dto.UserDto;
 import sori.jakku.kkunkkyu.memore.service.inter.UserService;
-import sori.jakku.kkunkkyu.memore.service.inter.WebService;
+import sori.jakku.kkunkkyu.memore.web.Response;
 
 import javax.security.auth.login.LoginException;
 
@@ -26,12 +25,11 @@ import javax.security.auth.login.LoginException;
 @RequestMapping("/login")
 public class UserLoginController {
 
-    private final WebService webService;
     private final UserService userService;
     private final TokenService tokenService;
 
     @PostMapping
-    public ResponseEntity<String> login(@RequestBody @Valid UserDto userDto) throws LoginException {
+    public ResponseEntity<Response> login(@RequestBody @Valid UserDto userDto) throws LoginException {
 
         /**
          * 아이디 비밀번호 확인
@@ -40,16 +38,12 @@ public class UserLoginController {
          * 토큰 어디에???? ㅇㅅㅇ
          */
 
-        JsonObject jsonObject = new JsonObject();
-
         // 아이디 비밀번호 확인
         User user = userService.login(userDto);
 
         // 토큰 생성
         String token = tokenService.creatToken(user.getId(), user.getUsername());
-        jsonObject.addProperty("token", token);
 
-
-        return webService.okResponse(jsonObject);
+        return Response.ok(token);
     }
 }

@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 import sori.jakku.kkunkkyu.memore.domain.*;
+import sori.jakku.kkunkkyu.memore.domain.dto.MemoListDto;
 import sori.jakku.kkunkkyu.memore.domain.dto.MemoUpdateDto;
 import sori.jakku.kkunkkyu.memore.domain.dto.MemoWriteDto;
 import sori.jakku.kkunkkyu.memore.domain.dto.TagTagList;
@@ -266,7 +267,7 @@ class MemoServiceImplTest {
         assertThat(tag).isNotNull();
     }
     @Test
-    @DisplayName("메모 리스트 : 1개")
+    @DisplayName("메모 리스트 : 태그 없음")
     void memoList_one() throws DuplicateMemoException, UserNotFoundException {
         User user = new User();
         User newUser = userRepository.save(user);
@@ -279,7 +280,7 @@ class MemoServiceImplTest {
             memoService.write(newUser.getId(), memoWriteDto);
         }
 
-        List<TagTagList> memoList = memoService.memoList(user.getId(), PageRequest.of(0, 12), "tag1");
+        List<MemoListDto> memoList = memoService.memoList(user.getId(), PageRequest.of(0, 12), null);
         assertThat(memoList.size()).isEqualTo(10);
         for (int i = 0; i < memoList.size(); i++) {
             System.out.println("keyword = " + memoList.get(i).getKeyword());

@@ -1,53 +1,41 @@
 package sori.jakku.kkunkkyu.memore.handler;
 
 import com.google.gson.JsonObject;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import sori.jakku.kkunkkyu.memore.domain.dto.Response;
-import sori.jakku.kkunkkyu.memore.service.inter.WebService;
+import sori.jakku.kkunkkyu.memore.web.Response;
 
-@Slf4j
 @ControllerAdvice
-@RequiredArgsConstructor
 public class GlobalExceptionHandler {
 
-    private final WebService webService;
-
     // @Valid 관련 Exception
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseBody
-    public ResponseEntity<String> invalidRequestHandler(MethodArgumentNotValidException e) {
+    public ResponseEntity<Response> invalidRequestHandler(MethodArgumentNotValidException e) {
 
         JsonObject jsonObject = new JsonObject();
 
         for (FieldError error : e.getFieldErrors()) {
             if (error.getField().equals("username")) {
-                jsonObject.addProperty("response", Response.BAD_USERNAME);
+                jsonObject.addProperty("response", "BAD_USERNAME");
             }
             if (error.getField().equals("password")) {
-                jsonObject.addProperty("response", Response.BAD_PWD);
+                jsonObject.addProperty("response", "BAD_PWD");
             }
             if (error.getField().equals("keyword")) {
-                jsonObject.addProperty("response", Response.BAD);
+                jsonObject.addProperty("response", "BAD");
             }
             if (error.getField().equals("tag") && e.getMessage().contains("size")) {
-                jsonObject.addProperty("response", Response.SIZE);
+                jsonObject.addProperty("response", "SIZE");
             }
             if (error.getField().equals("tag")) {
-                jsonObject.addProperty("response", Response.TAG_NOT_VALID);
+                jsonObject.addProperty("response", "TAG_NOT_VALID");
             }
         }
 
-        return webService.badResponse(jsonObject);
+        return Response.badRequest(jsonObject.toString());
     }
 
 }

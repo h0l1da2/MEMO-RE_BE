@@ -15,7 +15,6 @@ import sori.jakku.kkunkkyu.memore.config.jwt.TokenService;
 import sori.jakku.kkunkkyu.memore.domain.User;
 import sori.jakku.kkunkkyu.memore.domain.dto.MemoUpdateDto;
 import sori.jakku.kkunkkyu.memore.domain.dto.MemoWriteDto;
-import sori.jakku.kkunkkyu.memore.domain.dto.Response;
 import sori.jakku.kkunkkyu.memore.repository.CustomTagMemoRepository;
 import sori.jakku.kkunkkyu.memore.repository.MemoRepository;
 import sori.jakku.kkunkkyu.memore.repository.TagRepository;

@@ -6,10 +6,8 @@ import com.google.gson.JsonParser;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import sori.jakku.kkunkkyu.memore.config.jwt.TokenService;
-import sori.jakku.kkunkkyu.memore.domain.dto.Response;
 import sori.jakku.kkunkkyu.memore.service.inter.WebService;
 
 @Service
@@ -17,22 +15,6 @@ import sori.jakku.kkunkkyu.memore.service.inter.WebService;
 public class WebServiceImpl implements WebService {
 
     private final TokenService tokenService;
-
-    @Override
-    public ResponseEntity<String> okResponse(JsonObject jsonObject) {
-        Gson gson = new Gson();
-        jsonObject.addProperty("response", Response.OK);
-        String json = gson.toJson(jsonObject);
-        return ResponseEntity.ok()
-                .body(json);
-    }
-
-    @Override
-    public ResponseEntity<String> badResponse(JsonObject jsonObject) {
-        String json = objectToJson(jsonObject);
-        return ResponseEntity.badRequest()
-                .body(json);
-    }
 
     @Override
     public String jsonToString(String json, String value) {

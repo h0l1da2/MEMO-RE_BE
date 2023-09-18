@@ -11,6 +11,7 @@ import sori.jakku.kkunkkyu.memore.domain.Tag;
 import sori.jakku.kkunkkyu.memore.domain.User;
 import sori.jakku.kkunkkyu.memore.domain.dto.TagDto;
 import sori.jakku.kkunkkyu.memore.exception.ConditionNotMatchException;
+import sori.jakku.kkunkkyu.memore.exception.DuplicateMemoException;
 import sori.jakku.kkunkkyu.memore.exception.UserNotFoundException;
 import sori.jakku.kkunkkyu.memore.repository.TagRepository;
 import sori.jakku.kkunkkyu.memore.repository.UserRepository;
@@ -84,7 +85,7 @@ class TagServiceImplTest {
 
     @Test
     @DisplayName("태그 쓰기 성공")
-    void writeSuccess() throws UserNotFoundException, ConditionNotMatchException {
+    void writeSuccess() throws UserNotFoundException, ConditionNotMatchException, DuplicateMemoException {
         // given 유저, name
         User user = new User("user", "pwd");
         user = userRepository.save(user);
