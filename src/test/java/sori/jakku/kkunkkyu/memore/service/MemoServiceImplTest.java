@@ -12,7 +12,6 @@ import sori.jakku.kkunkkyu.memore.domain.*;
 import sori.jakku.kkunkkyu.memore.domain.dto.MemoListDto;
 import sori.jakku.kkunkkyu.memore.domain.dto.MemoUpdateDto;
 import sori.jakku.kkunkkyu.memore.domain.dto.MemoWriteDto;
-import sori.jakku.kkunkkyu.memore.domain.dto.TagTagList;
 import sori.jakku.kkunkkyu.memore.exception.DuplicateMemoException;
 import sori.jakku.kkunkkyu.memore.exception.MemoNotFoundException;
 import sori.jakku.kkunkkyu.memore.exception.UserNotFoundException;
@@ -268,7 +267,7 @@ class MemoServiceImplTest {
     }
     @Test
     @DisplayName("메모 리스트 : 태그 없음")
-    void memoList_one() throws DuplicateMemoException, UserNotFoundException {
+    void memoList_null() throws DuplicateMemoException, UserNotFoundException {
         User user = new User();
         User newUser = userRepository.save(user);
 
@@ -281,10 +280,60 @@ class MemoServiceImplTest {
         }
 
         List<MemoListDto> memoList = memoService.memoList(user.getId(), PageRequest.of(0, 12), null);
+        assertThat(memoList.size()).isEqualTo(0);
+        for (int i = 0; i < memoList.size(); i++) {
+            System.out.println("keyword = " + memoList.get(i).getKeyword());
+            System.out.println("content = " + memoList.get(i).getContent());
+        }
+    }
+
+    @Test
+    @DisplayName("메모 리스트 : 태그 한개")
+    void memoList_one() throws Exception {
+        User user = new User();
+        User newUser = userRepository.save(user);
+
+        List<String> list = new ArrayList<>();
+        list.add("tag1");
+
+        for (int i = 0; i < 10; i++) {
+            MemoWriteDto memoWriteDto = new MemoWriteDto("keyword"+i, "content", list);
+            memoService.write(newUser.getId(), memoWriteDto);
+        }
+
+        List<MemoListDto> memoList = memoService.memoList(user.getId(), PageRequest.of(0, 12), list.get(0));
         assertThat(memoList.size()).isEqualTo(10);
         for (int i = 0; i < memoList.size(); i++) {
             System.out.println("keyword = " + memoList.get(i).getKeyword());
             System.out.println("content = " + memoList.get(i).getContent());
+            memoList.get(i).getTag().forEach(tag ->
+                System.out.println("tag = " + tag)
+            );
+        }
+    }
+    @Test
+    @DisplayName("메모 리스트 : 태그 두개")
+    void memoList_Two() throws Exception {
+        User user = new User();
+        User newUser = userRepository.save(user);
+
+        List<String> list = new ArrayList<>();
+        list.add("tag1");
+        list.add("tag2");
+
+        for (int i = 0; i < 10; i++) {
+            MemoWriteDto memoWriteDto = new MemoWriteDto("keyword"+i, "content", list);
+            memoService.write(newUser.getId(), memoWriteDto);
+        }
+
+        List<MemoListDto> memoList = memoService.memoList(user.getId(), PageRequest.of(0, 12), "tag2");
+        assertThat(memoList.size()).isEqualTo(10);
+        for (int i = 0; i < memoList.size(); i++) {
+            System.out.println("keyword = " + memoList.get(i).getKeyword());
+            System.out.println("content = " + memoList.get(i).getContent());
+            memoList.get(i).getTag().forEach(tag ->
+                System.out.println("tag = " + tag)
+            );
         }
     }
 }

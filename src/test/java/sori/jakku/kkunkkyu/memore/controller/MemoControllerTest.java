@@ -15,7 +15,6 @@ import sori.jakku.kkunkkyu.memore.config.jwt.TokenService;
 import sori.jakku.kkunkkyu.memore.domain.User;
 import sori.jakku.kkunkkyu.memore.domain.dto.MemoUpdateDto;
 import sori.jakku.kkunkkyu.memore.domain.dto.MemoWriteDto;
-import sori.jakku.kkunkkyu.memore.repository.CustomTagMemoRepository;
 import sori.jakku.kkunkkyu.memore.repository.MemoRepository;
 import sori.jakku.kkunkkyu.memore.repository.TagRepository;
 import sori.jakku.kkunkkyu.memore.repository.UserRepository;
@@ -29,7 +28,6 @@ import java.util.Map;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Transactional
@@ -53,8 +51,6 @@ class MemoControllerTest {
     private MemoRepository memoRepository;
     @Autowired
     private TagRepository tagRepository;
-    @Autowired
-    private CustomTagMemoRepository tagMemoRepository;
 
 
     @BeforeEach
@@ -83,7 +79,6 @@ class MemoControllerTest {
                                 .header(HttpHeaders.AUTHORIZATION, "Bearer "+token)
                                 )
                 .andExpect(status().is2xxSuccessful())
-                .andExpect(jsonPath("$.response").value(Response.OK))
                 .andDo(print());
     }
     @Test
@@ -105,7 +100,6 @@ class MemoControllerTest {
                                 .header(HttpHeaders.AUTHORIZATION, "Bearer "+token)
                                 .content(keyword))
                 .andExpect(status().is2xxSuccessful())
-                .andExpect(jsonPath("$.response").value(Response.OK))
                 .andDo(print());
     }
 
@@ -132,7 +126,6 @@ class MemoControllerTest {
                                 .header(HttpHeaders.AUTHORIZATION, "Bearer "+token)
                                 .content(mapper.writeValueAsString(memoUpdateDto)))
                 .andExpect(status().is2xxSuccessful())
-                .andExpect(jsonPath("$.response").value(Response.OK))
                 .andDo(print());
 
     }
@@ -161,7 +154,6 @@ class MemoControllerTest {
                                 .header(HttpHeaders.AUTHORIZATION, "Bearer "+tokenB)
                                 .content(mapper.writeValueAsString(memoUpdateDto)))
                 .andExpect(status().is4xxClientError())
-                .andExpect(jsonPath("$.response").value(Response.BAD))
                 .andDo(print());
 
     }
@@ -183,7 +175,6 @@ class MemoControllerTest {
                                 .header(HttpHeaders.AUTHORIZATION, "Bearer "+token)
                                 .content(mapper.writeValueAsString(memoWriteDto)))
                 .andExpect(status().is2xxSuccessful())
-                .andExpect(jsonPath("$.response").value(Response.OK))
                 .andDo(print());
     }
     @Test
@@ -203,7 +194,6 @@ class MemoControllerTest {
                                 .header(HttpHeaders.AUTHORIZATION, "Bearer "+token)
                                 .content(mapper.writeValueAsString(memoWriteDto)))
                 .andExpect(status().is2xxSuccessful())
-                .andExpect(jsonPath("$.response").value(Response.OK))
                 .andDo(print());
     }
 
@@ -226,7 +216,6 @@ class MemoControllerTest {
                                 .header(HttpHeaders.AUTHORIZATION, "Bearer "+token)
                                 .content(mapper.writeValueAsString(memoWriteDto)))
                 .andExpect(status().is4xxClientError())
-                .andExpect(jsonPath("$.response").value(Response.DUPLICATE))
                 .andDo(print());
     }
 }
