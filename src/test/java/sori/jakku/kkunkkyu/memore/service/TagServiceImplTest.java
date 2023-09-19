@@ -80,7 +80,7 @@ class TagServiceImplTest {
         name = tagService.writeTag(user.getId(), name);
 
         // then
-        Tag tag = tagRepository.findById(1L).orElse(null);
+        Tag tag = tagRepository.findByNameAndUser(name, user).orElse(null);
         assertThat(name).isNotNull();
         assertThat(name).isEqualTo("태그");
         assertThat(tag).isNotNull();

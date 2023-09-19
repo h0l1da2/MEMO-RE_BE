@@ -15,6 +15,7 @@ import sori.jakku.kkunkkyu.memore.domain.dto.MemoWriteDto;
 import sori.jakku.kkunkkyu.memore.exception.DuplicateMemoException;
 import sori.jakku.kkunkkyu.memore.exception.MemoNotFoundException;
 import sori.jakku.kkunkkyu.memore.exception.UserNotFoundException;
+import sori.jakku.kkunkkyu.memore.repository.CustomTagMemoRepository;
 import sori.jakku.kkunkkyu.memore.repository.MemoRepository;
 import sori.jakku.kkunkkyu.memore.repository.TagRepository;
 import sori.jakku.kkunkkyu.memore.repository.UserRepository;
@@ -39,11 +40,14 @@ class MemoServiceImplTest {
     private MemoRepository memoRepository;
     @Autowired
     private TagRepository tagRepository;
+    @Autowired
+    private CustomTagMemoRepository tagMemoRepository;
 
     @BeforeEach
     void clean() {
         tagRepository.deleteAll();
         memoRepository.deleteAll();
+        tagMemoRepository.deleteAll();
 
     }
 

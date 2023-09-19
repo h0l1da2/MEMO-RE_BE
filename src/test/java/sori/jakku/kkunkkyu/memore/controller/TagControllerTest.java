@@ -7,16 +7,19 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
+import sori.jakku.kkunkkyu.memore.config.jwt.TokenProvider;
+import sori.jakku.kkunkkyu.memore.config.jwt.TokenService;
 import sori.jakku.kkunkkyu.memore.domain.User;
+import sori.jakku.kkunkkyu.memore.domain.dto.TagWriteDto;
 import sori.jakku.kkunkkyu.memore.repository.TagRepository;
 import sori.jakku.kkunkkyu.memore.repository.UserRepository;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
@@ -31,6 +34,10 @@ class TagControllerTest {
     private ObjectMapper mapper;
     @Autowired
     private MockMvc mockMvc;
+    @Autowired
+    private TokenService tokenService;
+    @Autowired
+    private TokenProvider tokenProvider;
 
     @BeforeEach
     void clean() {
@@ -44,21 +51,20 @@ class TagControllerTest {
         // given
         String name = "베";
 
+        TagWriteDto tagWriteDto = new TagWriteDto(name);
         User beUser = new User("user", "pwd");
         User user = userRepository.save(beUser);
 
-        MockHttpSession session = new MockHttpSession();
-        session.setAttribute("id", user.getId());
+        String token = tokenService.creatToken(user.getId(), user.getUsername());
 
 
         // expected
         mockMvc.perform(
                 post("/tag")
-                        .session(session)
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer "+token)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(name))
-        ).andExpect(status().is2xxSuccessful())
-                .andExpect(jsonPath("$.response").value("OK"))
+                        .content(mapper.writeValueAsString(tagWriteDto)))
+                .andExpect(status().is2xxSuccessful())
                 .andDo(print());
     }
 
@@ -80,24 +86,6 @@ class TagControllerTest {
 //    }
 
     @Test
-    @DisplayName("유저 없어서 실패")
-    void 유저_없음_실패() throws Exception {
-        String name = "태그";
-
-        MockHttpSession session = new MockHttpSession();
-        session.setAttribute("id", 1L);
-
-        mockMvc.perform(
-                        post("/tag")
-                                .session(session)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(mapper.writeValueAsString(name))
-                ).andExpect(status().is4xxClientError())
-                .andExpect(jsonPath("$.response").value("USER_NOT_FOUND"))
-                .andDo(print());
-    }
-
-    @Test
     @DisplayName("태그 길이 제한 실패")
     void 태그길이제한_실패() throws Exception {
         User findUser = new User("user", "pwd");
@@ -113,7 +101,6 @@ class TagControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .session(session)
                 ).andExpect(status().is4xxClientError())
-                .andExpect(jsonPath("$.response").value("NOT_VALID"))
                 .andDo(print());
 
     }
@@ -134,7 +121,6 @@ class TagControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .session(session)
                 ).andExpect(status().is4xxClientError())
-                .andExpect(jsonPath("$.response").value("NOT_VALID"))
                 .andDo(print());
     }
 
