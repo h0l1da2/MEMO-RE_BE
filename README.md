@@ -117,4 +117,4 @@ BE 강휴일<br>
   - 애자일 방식을 이용해 스프린트를 나눠 개발하여 두루뭉술한 일정에 따라가는 것이 아니라 역량에 따라 개발할 수 있었다.
 
 [👍 그 동안 함께해왔던 기록 notion 확인하기 클릭!](https://song-eun.notion.site/MEMO-RE-4b0c4a898ac146f099c3fdc43a278860?pvs=4)<br>
-[✉️ 개발 일기 훑어보기 클릭!](https://song-eun.notion.site/song-eun/MEMO-RE-4b0c4a898ac146f099c3fdc43a278860)
+[✉️ 개발 일기 훑어보기 클릭!](https://hyuil.tistory.com/category/%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8/%ED%8C%80%20%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8%29%20MEMO%3ARE)
