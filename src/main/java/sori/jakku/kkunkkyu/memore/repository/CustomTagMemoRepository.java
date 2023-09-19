@@ -234,4 +234,9 @@ public class CustomTagMemoRepository {
                 .fetchJoin()
                 .fetch();
     }
+
+    public void deleteAll() {
+        query.delete(tagMemo)
+                .execute();
+    }
 }

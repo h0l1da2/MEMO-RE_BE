@@ -1,6 +1,7 @@
 package sori.jakku.kkunkkyu.memore.handler;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import sori.jakku.kkunkkyu.memore.exception.UserNotFoundException;
@@ -18,6 +19,10 @@ public class UserExceptionHandler {
     }
     @ExceptionHandler(UsernameDuplException.class)
     public ResponseEntity<Response> usernameDuplicateHandler(UsernameDuplException e) {
+        return Response.badRequest(e.getMessage());
+    }
+    @ExceptionHandler(UsernameNotFoundException.class)
+    public ResponseEntity<Response> usernameNotFoundHandler(UsernameNotFoundException e) {
         return Response.badRequest(e.getMessage());
     }
     @ExceptionHandler(LoginException.class)
