@@ -12,11 +12,8 @@ import sori.jakku.kkunkkyu.memore.common.exception.BadRequestException;
 import sori.jakku.kkunkkyu.memore.memo.dto.MemoListDto;
 import sori.jakku.kkunkkyu.memore.memo.dto.MemoUpdateDto;
 import sori.jakku.kkunkkyu.memore.memo.dto.MemoWriteDto;
-import sori.jakku.kkunkkyu.memore.common.exception.DuplicateMemoException;
-import sori.jakku.kkunkkyu.memore.common.exception.MemoNotFoundException;
-import sori.jakku.kkunkkyu.memore.common.exception.UserNotFoundException;
 import sori.jakku.kkunkkyu.memore.memo.domain.Memo;
-import sori.jakku.kkunkkyu.memore.tagmemo.repository.CustomTagMemoRepository;
+import sori.jakku.kkunkkyu.memore.tagmemo.repository.TagQueryRepository;
 import sori.jakku.kkunkkyu.memore.memo.repository.MemoRepository;
 import sori.jakku.kkunkkyu.memore.tag.repository.TagRepository;
 import sori.jakku.kkunkkyu.memore.user.repository.UserRepository;
@@ -44,7 +41,7 @@ class MemoUseCaseImplTest {
     @Autowired
     private TagRepository tagRepository;
     @Autowired
-    private CustomTagMemoRepository tagMemoRepository;
+    private TagQueryRepository tagMemoRepository;
 
     @BeforeEach
     void clean() {

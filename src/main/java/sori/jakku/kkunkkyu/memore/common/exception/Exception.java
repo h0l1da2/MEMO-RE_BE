@@ -12,7 +12,10 @@ public enum Exception {
     MEMO_NOT_FOUND("메모를 찾을 수 없습니다.", HttpStatus.SC_NOT_FOUND),
     DUPLICATED_MEMO("중복 메모입니다.", HttpStatus.SC_BAD_REQUEST),
 
-    NOT_YOUR_DATA("본인의 데이터가 아닙니다.", HttpStatus.SC_FORBIDDEN)
+    NOT_YOUR_DATA("본인의 데이터가 아닙니다.", HttpStatus.SC_FORBIDDEN),
+
+    TAG_NOT_FOUND("태그를 찾을 수 없습니다.", HttpStatus.SC_NOT_FOUND),
+    DUPLICATED_TAG("중복 태그입니다.", HttpStatus.SC_BAD_REQUEST)
 
     ;
 

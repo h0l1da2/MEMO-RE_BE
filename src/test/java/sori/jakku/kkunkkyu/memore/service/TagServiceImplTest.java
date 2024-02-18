@@ -9,10 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import sori.jakku.kkunkkyu.memore.tag.domain.Tag;
 import sori.jakku.kkunkkyu.memore.user.domain.User;
-import sori.jakku.kkunkkyu.memore.tag.dto.TagDto;
-import sori.jakku.kkunkkyu.memore.common.exception.ConditionNotMatchException;
-import sori.jakku.kkunkkyu.memore.common.exception.DuplicateMemoException;
-import sori.jakku.kkunkkyu.memore.common.exception.UserNotFoundException;
+import sori.jakku.kkunkkyu.memore.tag.dto.MainTagSaveDto;
 import sori.jakku.kkunkkyu.memore.tag.repository.TagRepository;
 import sori.jakku.kkunkkyu.memore.user.repository.UserRepository;
 import sori.jakku.kkunkkyu.memore.tag.service.TagUseCase;
@@ -41,15 +38,15 @@ class TagServiceImplTest {
     void writeForMainSuccess() throws UserNotFoundException, ConditionNotMatchException {
         // given 유저와 태그DTO
         User user = userRepository.save(new User("user", "pwd"));
-        TagDto tagDto = new TagDto("tagA", "tagB", "tagC");
+        MainTagSaveDto mainTagSaveDto = new MainTagSaveDto("tagA", "tagB", "tagC");
 
         // when
-        String tagJson = tagService.writeForMain(user.getId(), tagDto);
+        String tagJson = tagService.writeForMain(user.getId(), mainTagSaveDto);
 
         // then json이 나온다 굿?
 
         Gson gson = new Gson();
-        String json = gson.toJson(tagDto);
+        String json = gson.toJson(mainTagSaveDto);
 
         assertThat(tagJson).isNotNull();
         assertThat(tagJson).isEqualTo(json);
@@ -60,12 +57,12 @@ class TagServiceImplTest {
     @DisplayName("메인메모쓰기:유저없어서 실패")
     void writeForMainUserNotFoundFail() throws ConditionNotMatchException {
         // given
-        TagDto tagDto = new TagDto("tagA", "tagB", "tagC");
+        MainTagSaveDto mainTagSaveDto = new MainTagSaveDto("tagA", "tagB", "tagC");
 
         // when then
         org.junit.jupiter.api.Assertions.assertThrows(
                 UserNotFoundException.class, () ->
-                        tagService.writeForMain(1L, tagDto));
+                        tagService.writeForMain(1L, mainTagSaveDto));
 
     }
 

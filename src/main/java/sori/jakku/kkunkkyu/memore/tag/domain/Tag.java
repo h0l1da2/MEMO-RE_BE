@@ -1,13 +1,14 @@
 package sori.jakku.kkunkkyu.memore.tag.domain;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import sori.jakku.kkunkkyu.memore.user.domain.User;
 
 @Getter
 @Entity
-@NoArgsConstructor
+@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Tag {
 
     @Id @GeneratedValue
@@ -16,10 +17,5 @@ public class Tag {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
-
-    public Tag(User user, String name) {
-        this.user = user;
-        this.name = name;
-    }
 
 }

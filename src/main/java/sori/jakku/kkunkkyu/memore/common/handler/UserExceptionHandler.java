@@ -4,8 +4,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import sori.jakku.kkunkkyu.memore.common.exception.UserNotFoundException;
-import sori.jakku.kkunkkyu.memore.common.exception.UsernameDuplException;
 import sori.jakku.kkunkkyu.memore.web.Response;
 
 import javax.security.auth.login.LoginException;

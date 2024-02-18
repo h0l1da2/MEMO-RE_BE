@@ -12,7 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import sori.jakku.kkunkkyu.memore.common.config.jwt.TokenUseCase;
 import sori.jakku.kkunkkyu.memore.user.domain.User;
-import sori.jakku.kkunkkyu.memore.tag.dto.TagDto;
+import sori.jakku.kkunkkyu.memore.tag.dto.MainTagSaveDto;
 import sori.jakku.kkunkkyu.memore.tag.repository.TagRepository;
 import sori.jakku.kkunkkyu.memore.user.repository.UserRepository;
 
@@ -46,7 +46,7 @@ class MainControllerTest {
     @DisplayName("메인 태그 추가 성공")
     void tagMainSuccess() throws Exception {
         // given : tagDTO, User, Session
-        TagDto tagDto = new TagDto("tagA", "tagB", "tagC");
+        MainTagSaveDto mainTagSaveDto = new MainTagSaveDto("tagA", "tagB", "tagC");
         User user = new User("user", "pwd");
         user = userRepository.save(user);
 
@@ -57,7 +57,7 @@ class MainControllerTest {
                         post("/")
                                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(mapper.writeValueAsString(tagDto))
+                                .content(mapper.writeValueAsString(mainTagSaveDto))
                 ).andExpect(status().is2xxSuccessful())
                 .andDo(print());
     }
@@ -65,7 +65,7 @@ class MainControllerTest {
     @DisplayName("메인 태그 길이 20자 이상 실패")
     void tagMainLengthFail() throws Exception {
         // given : tagDTO, User, Session
-        TagDto tagDto = new TagDto("tagA12344ㅈ도ㅕ3294842ㅠㅓㅜ32356789", "tagB", "tagC");
+        MainTagSaveDto mainTagSaveDto = new MainTagSaveDto("tagA12344ㅈ도ㅕ3294842ㅠㅓㅜ32356789", "tagB", "tagC");
         User user = new User("user", "pwd");
         user = userRepository.save(user);
 
@@ -76,7 +76,7 @@ class MainControllerTest {
                         post("/")
                                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(mapper.writeValueAsString(tagDto))
+                                .content(mapper.writeValueAsString(mainTagSaveDto))
                 ).andExpect(status().is4xxClientError())
                 .andDo(print());
     }
@@ -85,7 +85,7 @@ class MainControllerTest {
     @DisplayName("메인 태그 없는 유저 요청 실패")
     void tagMainUserNotFoundFail() throws Exception {
         // given : tagDTO, User, Session
-        TagDto tagDto = new TagDto();
+        MainTagSaveDto mainTagSaveDto = new MainTagSaveDto();
 
         User user = new User("user", "pwd");
         user = userRepository.save(user);
@@ -97,7 +97,7 @@ class MainControllerTest {
                         post("/")
                                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(mapper.writeValueAsString(tagDto))
+                                .content(mapper.writeValueAsString(mainTagSaveDto))
                 ).andExpect(status().is4xxClientError())
                 .andDo(print());
     }

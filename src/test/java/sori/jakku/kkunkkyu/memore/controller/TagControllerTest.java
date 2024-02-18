@@ -14,7 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import sori.jakku.kkunkkyu.memore.common.config.jwt.TokenProvider;
 import sori.jakku.kkunkkyu.memore.common.config.jwt.TokenUseCase;
 import sori.jakku.kkunkkyu.memore.user.domain.User;
-import sori.jakku.kkunkkyu.memore.tag.dto.TagWriteDto;
+import sori.jakku.kkunkkyu.memore.tag.dto.TagDto;
 import sori.jakku.kkunkkyu.memore.tag.repository.TagRepository;
 import sori.jakku.kkunkkyu.memore.user.repository.UserRepository;
 
@@ -51,7 +51,7 @@ class TagControllerTest {
         // given
         String name = "베";
 
-        TagWriteDto tagWriteDto = new TagWriteDto(name);
+        TagDto tagDto = new TagDto(name);
         User beUser = new User("user", "pwd");
         User user = userRepository.save(beUser);
 
@@ -63,7 +63,7 @@ class TagControllerTest {
                 post("/tag")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer "+token)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(tagWriteDto)))
+                        .content(mapper.writeValueAsString(tagDto)))
                 .andExpect(status().is2xxSuccessful())
                 .andDo(print());
     }

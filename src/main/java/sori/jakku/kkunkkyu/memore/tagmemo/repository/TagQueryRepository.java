@@ -9,14 +9,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import sori.jakku.kkunkkyu.memore.domain.*;
-import sori.jakku.kkunkkyu.memore.common.exception.MemoNotFoundException;
-import sori.jakku.kkunkkyu.memore.common.exception.UserNotFoundException;
 import sori.jakku.kkunkkyu.memore.memo.domain.Memo;
 import sori.jakku.kkunkkyu.memore.memo.dto.MemoListDto;
 import sori.jakku.kkunkkyu.memore.memo.dto.MemoUpdateDto;
 import sori.jakku.kkunkkyu.memore.memo.dto.MemoWriteDto;
 import sori.jakku.kkunkkyu.memore.tag.domain.Tag;
-import sori.jakku.kkunkkyu.memore.tag.dto.TagDto;
+import sori.jakku.kkunkkyu.memore.tag.mapper.TagMapper;
 import sori.jakku.kkunkkyu.memore.tag.repository.TagRepository;
 import sori.jakku.kkunkkyu.memore.tagmemo.domain.TagMemo;
 import sori.jakku.kkunkkyu.memore.user.domain.User;
@@ -31,21 +29,12 @@ import static sori.jakku.kkunkkyu.memore.domain.QTagMemo.*;
 @Slf4j
 @Repository
 @RequiredArgsConstructor
-public class CustomTagMemoRepository {
+public class TagQueryRepository {
 
     private final TagRepository tagRepository;
+    private final TagMapper tagMapper;
     private final EntityManager em;
     private final JPAQueryFactory query;
-
-    @Transactional
-    public TagDto saveTagMain(User user, TagDto tagDto) {
-        // 트랜잭션 시작
-        em.persist(new Tag(user, tagDto.getTagA()));
-        em.persist(new Tag(user, tagDto.getTagB()));
-        em.persist(new Tag(user, tagDto.getTagC()));
-        // 끝
-        return tagDto;
-    }
 
     @Transactional
     public void saveTagAndMemo(User user, MemoWriteDto memoWriteDto) {
@@ -74,14 +63,14 @@ public class CustomTagMemoRepository {
         if (dtoTagList != null) {
             dtoTagList.stream().forEach(
                     name -> {
-                        Tag newTag = new Tag(user, name);
+                        Tag newTag = tagMapper.toEntity(user, name);
                         em.persist(newTag);
                         tagList.add(newTag);
                     });
         }
 
         // 태그메모 추가
-        tagList.stream().forEach(tag ->
+        tagList.forEach(tag ->
                 em.persist(new TagMemo(memo, tag)));
 
         em.close();
@@ -103,7 +92,8 @@ public class CustomTagMemoRepository {
                     if (value == true) {
                         Tag tag = tagRepository.findByNameAndUser(key, memo.getUser()).orElse(null);
                         if (tag == null) {
-                            tag = new Tag(memo.getUser(), key);
+
+                            tag = tagMapper.toEntity(memo.getUser(), key);
                             em.persist(tag);
                         }
                         em.persist(new TagMemo(findMemo, tag));
@@ -218,33 +208,12 @@ public class CustomTagMemoRepository {
 
     }
 
-    public void deleteTag(Long id, String name) throws MemoNotFoundException, UserNotFoundException {
-        User user = em.find(User.class, id);
-        if (user == null) {
-            log.error("유저가 없음 = {}", id);
-            throw new UserNotFoundException("유저가 없습니다.");
-        }
-
-        Tag findTag = tagRepository.findByNameAndUser(name, user).orElse(null);
-
-        if (findTag == null) {
-            log.error("해당 태그는 없음 = {}", name);
-            throw new MemoNotFoundException("해당 메모는 없습니다.");
-        }
-
-        em.remove(findTag);
-    }
-
-    public List<String> findAllTag(Long id) {
+    public List<String> findAllTag(User user) {
         return query.select(tag.name)
                 .from(tagMemo)
-                .where(tagMemo.tag.user.id.eq(id))
+                .where(tagMemo.tag.user.eq(user))
                 .fetchJoin()
                 .fetch();
     }
 
-    public void deleteAll() {
-        query.delete(tagMemo)
-                .execute();
-    }
 }

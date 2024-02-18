@@ -11,7 +11,7 @@ import sori.jakku.kkunkkyu.memore.memo.dto.MemoListDto;
 import sori.jakku.kkunkkyu.memore.user.domain.User;
 import sori.jakku.kkunkkyu.memore.memo.dto.MemoUpdateDto;
 import sori.jakku.kkunkkyu.memore.memo.dto.MemoWriteDto;
-import sori.jakku.kkunkkyu.memore.tagmemo.repository.CustomTagMemoRepository;
+import sori.jakku.kkunkkyu.memore.tagmemo.repository.TagQueryRepository;
 import sori.jakku.kkunkkyu.memore.memo.repository.MemoRepository;
 import sori.jakku.kkunkkyu.memore.user.service.UserUseCase;
 
@@ -24,7 +24,7 @@ public class MemoService implements MemoUseCase {
 
     private final MemoRepository memoRepository;
     private final UserUseCase userService;
-    private final CustomTagMemoRepository tagMemoRepository;
+    private final TagQueryRepository tagMemoRepository;
 
 
     @Override
