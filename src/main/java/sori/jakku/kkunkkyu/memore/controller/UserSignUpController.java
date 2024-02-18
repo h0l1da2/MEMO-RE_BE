@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import sori.jakku.kkunkkyu.memore.domain.dto.UserDto;
 import sori.jakku.kkunkkyu.memore.exception.UsernameDuplException;
@@ -16,6 +17,7 @@ import sori.jakku.kkunkkyu.memore.web.Response;
  */
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/v1/sign-up")
 public class UserSignUpController {
 
     private final UserService userService;
@@ -25,7 +27,7 @@ public class UserSignUpController {
      * 패스워드 확인
      * 회원 가입
      */
-    @PostMapping("/usernameValid")
+    @PostMapping("/username/valid")
     public ResponseEntity<Response> usernameValid(@RequestBody String username) throws UsernameDuplException {
         boolean valid = false;
 

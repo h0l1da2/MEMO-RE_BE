@@ -30,9 +30,9 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(req -> req
-                        .requestMatchers("/test/**")
-                                .hasRole("USER")
-                                .anyRequest().permitAll())
+                        .requestMatchers("/api/v1/main","/api/v1/tag", "/api/v1/memo")
+                        .hasRole("USER")
+                        .anyRequest().permitAll())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(new JwtFilter(tokenService, userDetailsService), UsernamePasswordAuthenticationFilter.class)
                 .build();

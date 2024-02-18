@@ -20,7 +20,7 @@ import javax.security.auth.login.LoginException;
  */
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/login")
+@RequestMapping("/api/v1/login")
 public class UserLoginController {
 
     private final UserService userService;
@@ -28,14 +28,6 @@ public class UserLoginController {
 
     @PostMapping
     public ResponseEntity<Response> login(@RequestBody @Valid UserDto userDto) throws LoginException {
-
-        /**
-         * 아이디 비밀번호 확인
-         * 토큰 생성
-         * 세션에 인덱스 등록
-         * 토큰 어디에???? ㅇㅅㅇ
-         */
-
         // 아이디 비밀번호 확인
         User user = userService.login(userDto);
 

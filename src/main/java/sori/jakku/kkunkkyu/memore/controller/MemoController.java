@@ -20,7 +20,7 @@ import sori.jakku.kkunkkyu.memore.web.Response;
 import java.util.List;
 
 @RestController
-@RequestMapping("/memo")
+@RequestMapping("/api/v1/memo")
 @RequiredArgsConstructor
 public class MemoController {
 

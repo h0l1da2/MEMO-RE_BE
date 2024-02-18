@@ -17,7 +17,7 @@ import sori.jakku.kkunkkyu.memore.web.Response;
 import java.util.List;
 
 @RestController
-@RequestMapping("/tag")
+@RequestMapping("/api/v1/tag")
 @RequiredArgsConstructor
 public class TagController {
 

@@ -17,7 +17,7 @@ import sori.jakku.kkunkkyu.memore.web.Response;
 
 @Slf4j
 @RestController
-@RequestMapping("/")
+@RequestMapping("/api/v1/main")
 @RequiredArgsConstructor
 public class MainController {
 
