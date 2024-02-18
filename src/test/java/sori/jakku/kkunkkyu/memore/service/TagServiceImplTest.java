@@ -7,15 +7,15 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import sori.jakku.kkunkkyu.memore.domain.Tag;
-import sori.jakku.kkunkkyu.memore.domain.User;
-import sori.jakku.kkunkkyu.memore.domain.dto.TagDto;
-import sori.jakku.kkunkkyu.memore.exception.ConditionNotMatchException;
-import sori.jakku.kkunkkyu.memore.exception.DuplicateMemoException;
-import sori.jakku.kkunkkyu.memore.exception.UserNotFoundException;
-import sori.jakku.kkunkkyu.memore.repository.TagRepository;
-import sori.jakku.kkunkkyu.memore.repository.UserRepository;
-import sori.jakku.kkunkkyu.memore.service.inter.TagService;
+import sori.jakku.kkunkkyu.memore.tag.domain.Tag;
+import sori.jakku.kkunkkyu.memore.user.domain.User;
+import sori.jakku.kkunkkyu.memore.tag.dto.TagDto;
+import sori.jakku.kkunkkyu.memore.common.exception.ConditionNotMatchException;
+import sori.jakku.kkunkkyu.memore.common.exception.DuplicateMemoException;
+import sori.jakku.kkunkkyu.memore.common.exception.UserNotFoundException;
+import sori.jakku.kkunkkyu.memore.tag.repository.TagRepository;
+import sori.jakku.kkunkkyu.memore.user.repository.UserRepository;
+import sori.jakku.kkunkkyu.memore.tag.service.TagUseCase;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -23,7 +23,7 @@ import static org.assertj.core.api.Assertions.*;
 class TagServiceImplTest {
 
     @Autowired
-    private TagService tagService;
+    private TagUseCase tagService;
     @Autowired
     private TagRepository tagRepository;
     @Autowired

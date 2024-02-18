@@ -11,15 +11,15 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-import sori.jakku.kkunkkyu.memore.config.jwt.TokenUseCase;
-import sori.jakku.kkunkkyu.memore.domain.User;
-import sori.jakku.kkunkkyu.memore.domain.dto.MemoUpdateDto;
-import sori.jakku.kkunkkyu.memore.domain.dto.MemoWriteDto;
-import sori.jakku.kkunkkyu.memore.repository.MemoRepository;
-import sori.jakku.kkunkkyu.memore.repository.TagRepository;
-import sori.jakku.kkunkkyu.memore.repository.UserRepository;
-import sori.jakku.kkunkkyu.memore.service.inter.MemoService;
-import sori.jakku.kkunkkyu.memore.service.inter.WebService;
+import sori.jakku.kkunkkyu.memore.common.config.jwt.TokenUseCase;
+import sori.jakku.kkunkkyu.memore.common.converter.JsonStringConverter;
+import sori.jakku.kkunkkyu.memore.user.domain.User;
+import sori.jakku.kkunkkyu.memore.memo.dto.MemoUpdateDto;
+import sori.jakku.kkunkkyu.memore.memo.dto.MemoWriteDto;
+import sori.jakku.kkunkkyu.memore.memo.repository.MemoRepository;
+import sori.jakku.kkunkkyu.memore.tag.repository.TagRepository;
+import sori.jakku.kkunkkyu.memore.user.repository.UserRepository;
+import sori.jakku.kkunkkyu.memore.memo.service.MemoUseCase;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,13 +40,11 @@ class MemoControllerTest {
     @Autowired
     private MockMvc mockMvc;
     @Autowired
-    private WebService webService;
-    @Autowired
     private UserRepository userRepository;
     @Autowired
     private TokenUseCase tokenService;
     @Autowired
-    private MemoService memoService;
+    private MemoUseCase memoService;
     @Autowired
     private MemoRepository memoRepository;
     @Autowired
@@ -92,7 +90,7 @@ class MemoControllerTest {
 
         Map<String, String> map = new HashMap<>();
         map.put("keyword", "keyword");
-        String keyword = webService.objectToJson(map);
+        String keyword = JsonStringConverter.objectToJson(map);
 
         mockMvc.perform(
                         delete("/memo")

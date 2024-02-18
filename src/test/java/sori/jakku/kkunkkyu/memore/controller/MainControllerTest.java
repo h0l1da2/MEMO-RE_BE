@@ -10,11 +10,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import sori.jakku.kkunkkyu.memore.config.jwt.TokenUseCase;
-import sori.jakku.kkunkkyu.memore.domain.User;
-import sori.jakku.kkunkkyu.memore.domain.dto.TagDto;
-import sori.jakku.kkunkkyu.memore.repository.TagRepository;
-import sori.jakku.kkunkkyu.memore.repository.UserRepository;
+import sori.jakku.kkunkkyu.memore.common.config.jwt.TokenUseCase;
+import sori.jakku.kkunkkyu.memore.user.domain.User;
+import sori.jakku.kkunkkyu.memore.tag.dto.TagDto;
+import sori.jakku.kkunkkyu.memore.tag.repository.TagRepository;
+import sori.jakku.kkunkkyu.memore.user.repository.UserRepository;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
