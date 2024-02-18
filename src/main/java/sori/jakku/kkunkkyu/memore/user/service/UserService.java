@@ -4,19 +4,18 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import sori.jakku.kkunkkyu.memore.common.config.jwt.JwtToken;
 import sori.jakku.kkunkkyu.memore.common.config.jwt.TokenUseCase;
-import sori.jakku.kkunkkyu.memore.common.converter.JsonStringConverter;
 import sori.jakku.kkunkkyu.memore.common.exception.BadRequestException;
 import sori.jakku.kkunkkyu.memore.common.exception.Exception;
 import sori.jakku.kkunkkyu.memore.user.domain.User;
-import sori.jakku.kkunkkyu.memore.user.dto.UserDto;
+import sori.jakku.kkunkkyu.memore.user.dto.LoginDto;
+import sori.jakku.kkunkkyu.memore.user.dto.SignUpDto;
+import sori.jakku.kkunkkyu.memore.user.mapper.UserMapper;
 import sori.jakku.kkunkkyu.memore.user.repository.UserRepository;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -26,29 +25,11 @@ public class UserService implements UserUseCase {
     private final UserRepository userRepository;
     private final TokenUseCase tokenUseCase;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final UserMapper userMapper;
 
     @Override
-    public boolean usernameDupl(String username) {
-        username = JsonStringConverter.jsonToString(Objects.requireNonNull(username), "username");
-
-        // 아이디 조건 검증
-        if (!usernameValid(username)){
-            return false;
-        }
-
-        // 아이디 중복 검증
-        User user = userRepository.findByUsername(username).orElse(null);
-        if (user != null) {
-            log.error("아이디 중복 = {}", username);
-            throw new BadRequestException(Exception.DUPLICATED_USERNAME);
-        }
-
-        return true;
-    }
-
-    @Override
-    public UserDto signUp(UserDto userDto) {
-        User findUser = userRepository.findByUsername(userDto.getUsername())
+    public void signUp(SignUpDto dto) {
+        User findUser = userRepository.findByUsername(dto.username())
                 .orElse(null);
 
         if (findUser != null) {
@@ -56,18 +37,19 @@ public class UserService implements UserUseCase {
             throw new BadRequestException(Exception.DUPLICATED_USERNAME);
         }
 
-        userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
-        User user = userRepository.save(new User(userDto));
+        String encodePwd = passwordEncoder.encode(dto.password());
+        User user = userMapper.toEntity(dto);
+        user.encodedPassword(encodePwd);
 
-        return new UserDto(user);
+        userRepository.save(user);
     }
 
     @Override
-    public Map<String, String> login(UserDto userDto) {
-        User findUser = userRepository.findByUsername(userDto.getUsername())
+    public Map<String, String> login(LoginDto loginDto) {
+        User findUser = userRepository.findByUsername(loginDto.username())
                 .orElseThrow(() -> new BadRequestException(Exception.USER_NOT_FOUND));
 
-        boolean matches = passwordEncoder.matches(userDto.getPassword(), findUser.getPassword());
+        boolean matches = passwordEncoder.matches(loginDto.password(), findUser.getPassword());
         if (!matches) {
             log.error("비밀번호가 다름 = {}", findUser.getUsername());
             throw new BadRequestException(Exception.USER_NOT_FOUND);
@@ -79,31 +61,7 @@ public class UserService implements UserUseCase {
     }
 
     @Override
-    public User userById(Long id) {
-        return userRepository.findById(id).orElse(null);
+    public User findById(Long id) {
+        return userRepository.findById(id).orElseThrow(() -> new BadRequestException(Exception.USER_NOT_FOUND));
     }
-
-    private boolean usernameValid(String username) throws NullPointerException {
-        /**
-         * 아이디
-         * - 4자 이상 ~ 15자 이하
-         * - 소문자, 숫자만
-         * - 공백 불허용
-         */
-        if (!StringUtils.hasText(username)) {
-            return false;
-        }
-
-        if (username.length() < 4 || username.length() > 15) {
-            return false;
-        }
-
-        for (char c : username.toCharArray()) {
-            if (!Character.isLowerCase(c) && !Character.isDigit(c)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
 }

@@ -36,7 +36,7 @@ public class TagService implements TagUseCase {
          * return Json
          */
 
-        User user = userService.userById(id);
+        User user = userService.findById(id);
         if (user == null) {
             log.error("id 에 해당하는 유저 없음 = {}", id);
             throw new UserNotFoundException("유저가 없습니다.");
@@ -60,7 +60,7 @@ public class TagService implements TagUseCase {
             throw new ConditionNotMatchException("태그 이름 형식이 맞지 않음");
         }
 
-        User user = userService.userById(id);
+        User user = userService.findById(id);
         if (user == null) {
             log.error("id 에 해당하는 유저 없음 = {}", id);
             throw new UserNotFoundException("유저가 없습니다.");
@@ -85,7 +85,7 @@ public class TagService implements TagUseCase {
 
     @Override
     public List<String> tagList(Long id) throws UserNotFoundException {
-        User user = userService.userById(id);
+        User user = userService.findById(id);
 
         if (user == null) {
             log.error("id 에 해당하는 유저 없음 = {}", id);

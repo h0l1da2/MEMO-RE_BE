@@ -29,7 +29,7 @@ public class MemoService implements MemoUseCase {
 
     @Override
     public void write(Long id, MemoWriteDto memoWriteDto) {
-        User user = userService.userById(id);
+        User user = userService.findById(id);
 
         if (user == null) {
             log.error("유저 찾을 수 없음 = {}", id);
@@ -51,7 +51,7 @@ public class MemoService implements MemoUseCase {
 
     @Override
     public void changeMemo(Long id, MemoUpdateDto memoUpdateDto) {
-        User user = userService.userById(id);
+        User user = userService.findById(id);
 
         Memo memo = memoRepository.findByKeywordAndUser(memoUpdateDto.getOriginKey(), user)
                 .orElseThrow(() -> new BadRequestException(Exception.MEMO_NOT_FOUND));
@@ -74,7 +74,7 @@ public class MemoService implements MemoUseCase {
 
     @Override
     public void removeMemo(Long id, String keyword) {
-        User user = userService.userById(id);
+        User user = userService.findById(id);
 
         Memo memo = memoRepository.findByKeywordAndUser(keyword, user)
                 .orElseThrow(() -> new BadRequestException(Exception.MEMO_NOT_FOUND));

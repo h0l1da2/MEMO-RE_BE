@@ -5,7 +5,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import sori.jakku.kkunkkyu.memore.user.dto.UserDto;
+import sori.jakku.kkunkkyu.memore.user.dto.LoginDto;
 
 @Entity
 @Getter
@@ -22,8 +22,12 @@ public class User {
         this.password = password;
     }
 
-    public User(UserDto userDto) {
-        this.username = userDto.getUsername();
-        this.password = userDto.getPassword();
+    public User(LoginDto loginDto) {
+        this.username = loginDto.username();
+        this.password = loginDto.password();
+    }
+
+    public void encodedPassword(String encodePwd) {
+        this.password = encodePwd;
     }
 }
