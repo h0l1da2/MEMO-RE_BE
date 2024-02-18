@@ -5,12 +5,12 @@ import sori.jakku.kkunkkyu.memore.user.dto.UserDto;
 import sori.jakku.kkunkkyu.memore.common.exception.UsernameDuplException;
 
 import javax.security.auth.login.LoginException;
+import java.util.Map;
 
 public interface UserUseCase {
-    boolean usernameDupl(String username) throws UsernameDuplException;
+    boolean usernameDupl(String username);
     // 회원가입
-    UserDto signUp(UserDto userDto) throws UsernameDuplException;
-    User login(UserDto userDto) throws LoginException;
-    User userByUsername(String username);
+    UserDto signUp(UserDto userDto);
+    Map<String, String> login(UserDto userDto);
     User userById(Long id);
 }

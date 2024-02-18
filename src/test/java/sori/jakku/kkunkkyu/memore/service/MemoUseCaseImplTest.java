@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
+import sori.jakku.kkunkkyu.memore.common.exception.BadRequestException;
 import sori.jakku.kkunkkyu.memore.memo.dto.MemoListDto;
 import sori.jakku.kkunkkyu.memore.memo.dto.MemoUpdateDto;
 import sori.jakku.kkunkkyu.memore.memo.dto.MemoWriteDto;
@@ -55,7 +56,7 @@ class MemoUseCaseImplTest {
 
     @Test
     @DisplayName("메모 쓰기 성공 : 모든 값")
-    void 모든값쓰기_성공() throws DuplicateMemoException, UserNotFoundException {
+    void 모든값쓰기_성공() {
         User user = new User();
         User newUser = userRepository.save(user);
 
@@ -78,7 +79,7 @@ class MemoUseCaseImplTest {
     }
     @Test
     @DisplayName("메모 쓰기 성공 : 키워드")
-    void 키워드쓰기_성공() throws DuplicateMemoException, UserNotFoundException {
+    void 키워드쓰기_성공() {
         User user = new User();
         User newUser = userRepository.save(user);
         MemoWriteDto memoWriteDto = new MemoWriteDto("keyword");
@@ -101,7 +102,7 @@ class MemoUseCaseImplTest {
 
     @Test
     @DisplayName("메모 쓰기 성공 : 키워드, 내용")
-    void 키워드_내용_쓰기_성공() throws DuplicateMemoException, UserNotFoundException {
+    void 키워드_내용_쓰기_성공() {
         User user = new User();
         User newUser = userRepository.save(user);
         MemoWriteDto memoWriteDto = new MemoWriteDto("keyword", "content");
@@ -124,7 +125,7 @@ class MemoUseCaseImplTest {
     }
     @Test
     @DisplayName("메모 쓰기 성공 : 키워드, 태그")
-    void 키워드_태그_쓰기_성공() throws DuplicateMemoException, UserNotFoundException {
+    void 키워드_태그_쓰기_성공() {
         User user = new User();
         User newUser = userRepository.save(user);
 
@@ -152,7 +153,7 @@ class MemoUseCaseImplTest {
 
     @Test
     @DisplayName("메모 쓰기 실패 : 중복 키워드")
-    void 메모쓰기_키워드중복_실패() throws DuplicateMemoException, UserNotFoundException {
+    void 메모쓰기_키워드중복_실패() {
         User user = new User();
         User newUser = userRepository.save(user);
 
@@ -163,14 +164,14 @@ class MemoUseCaseImplTest {
         memoService.write(newUser.getId(), memoWriteDto);
 
         org.junit.jupiter.api.Assertions.
-                assertThrows(DuplicateMemoException.class,
+                assertThrows(BadRequestException.class,
                 () -> memoService.write(newUser.getId(), memoWriteDto));
 
     }
 
     @Test
     @DisplayName("메모 수정 성공 : 모든 값")
-    void 메모수정_성공() throws DuplicateMemoException, UserNotFoundException, MemoNotFoundException {
+    void 메모수정_성공() {
         User user = new User();
         User newUser = userRepository.save(user);
         List<String> list = new ArrayList<>();
@@ -202,7 +203,7 @@ class MemoUseCaseImplTest {
     }
     @Test
     @DisplayName("메모 수정 성공 : 태그 없음")
-    void 메모수정_태그없음_성공() throws DuplicateMemoException, UserNotFoundException, MemoNotFoundException {
+    void 메모수정_태그없음_성공() {
         User user = new User();
         User newUser = userRepository.save(user);
         List<String> list = new ArrayList<>();
@@ -232,7 +233,7 @@ class MemoUseCaseImplTest {
     }
     @Test
     @DisplayName("메모 수정 실패 : 키워드 실패")
-    void 메모수정_키워드_실패() throws DuplicateMemoException, UserNotFoundException {
+    void 메모수정_키워드_실패() {
         User user = new User();
         User newUser = userRepository.save(user);
         List<String> list = new ArrayList<>();
@@ -249,13 +250,13 @@ class MemoUseCaseImplTest {
         map.put("tag1", false);
         memoUpdateDto.setTag(map);
 
-        Assertions.assertThrows(MemoNotFoundException.class, () ->
+        Assertions.assertThrows(BadRequestException.class, () ->
                 memoService.changeMemo(newUser.getId(), memoUpdateDto));
     }
 
     @Test
     @DisplayName("메모 삭제 성공")
-    void removeMemo() throws DuplicateMemoException, UserNotFoundException, MemoNotFoundException {
+    void removeMemo() {
         User user = new User();
         User newUser = userRepository.save(user);
         List<String> list = new ArrayList<>();
@@ -273,7 +274,7 @@ class MemoUseCaseImplTest {
     }
     @Test
     @DisplayName("메모 리스트 : 태그 없음")
-    void memoList_null() throws DuplicateMemoException, UserNotFoundException {
+    void memoList_null() {
         User user = new User();
         User newUser = userRepository.save(user);
 

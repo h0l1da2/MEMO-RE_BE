@@ -4,14 +4,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import sori.jakku.kkunkkyu.memore.common.exception.*;
+import sori.jakku.kkunkkyu.memore.common.exception.Exception;
 import sori.jakku.kkunkkyu.memore.memo.domain.Memo;
 import sori.jakku.kkunkkyu.memore.memo.dto.MemoListDto;
 import sori.jakku.kkunkkyu.memore.user.domain.User;
 import sori.jakku.kkunkkyu.memore.memo.dto.MemoUpdateDto;
 import sori.jakku.kkunkkyu.memore.memo.dto.MemoWriteDto;
-import sori.jakku.kkunkkyu.memore.common.exception.DuplicateMemoException;
-import sori.jakku.kkunkkyu.memore.common.exception.MemoNotFoundException;
-import sori.jakku.kkunkkyu.memore.common.exception.UserNotFoundException;
 import sori.jakku.kkunkkyu.memore.tagmemo.repository.CustomTagMemoRepository;
 import sori.jakku.kkunkkyu.memore.memo.repository.MemoRepository;
 import sori.jakku.kkunkkyu.memore.user.service.UserUseCase;
@@ -29,12 +28,12 @@ public class MemoService implements MemoUseCase {
 
 
     @Override
-    public void write(Long id, MemoWriteDto memoWriteDto) throws DuplicateMemoException, UserNotFoundException {
+    public void write(Long id, MemoWriteDto memoWriteDto) {
         User user = userService.userById(id);
 
         if (user == null) {
             log.error("유저 찾을 수 없음 = {}", id);
-            throw new UserNotFoundException("유저를 찾을 수 없습니다.");
+            throw new BadRequestException(Exception.USER_NOT_FOUND);
         }
 
         // 키워드 중복 조사
@@ -42,7 +41,7 @@ public class MemoService implements MemoUseCase {
 
         if (findMemo != null) {
             log.error("메모가 중복 = {}", memoWriteDto.getKeyword());
-            throw new DuplicateMemoException("중복 메모");
+            throw new BadRequestException(Exception.DUPLICATED_MEMO);
         }
 
         // 태그 없으면 추가, 불러오기
@@ -51,22 +50,22 @@ public class MemoService implements MemoUseCase {
     }
 
     @Override
-    public void changeMemo(Long id, MemoUpdateDto memoUpdateDto) throws MemoNotFoundException, UserNotFoundException, DuplicateMemoException {
+    public void changeMemo(Long id, MemoUpdateDto memoUpdateDto) {
         User user = userService.userById(id);
 
         Memo memo = memoRepository.findByKeywordAndUser(memoUpdateDto.getOriginKey(), user)
-                .orElseThrow(MemoNotFoundException::new);
+                .orElseThrow(() -> new BadRequestException(Exception.MEMO_NOT_FOUND));
 
         if (memo.getUser() != user) {
             log.error("본인 메모가 아님 메모 아이디 = {}, 로그인 아이디 = {}", memo.getUser().getId(), id);
-            throw new UserNotFoundException("본인 메모가 아닙니다.");
+            throw new BadRequestException(Exception.NOT_YOUR_DATA);
         }
 
         Memo findNewKey = memoRepository.findByKeywordAndUser(memoUpdateDto.getNewKey(), user).orElse(null);
 
         if (findNewKey != null) {
             log.error("메모 키워드가 중복 = {}", findNewKey.getKeyword());
-            throw new DuplicateMemoException("바꿀 메모가 중복 메모입니다.");
+            throw new BadRequestException(Exception.MEMO_NOT_FOUND);
         }
 
         tagMemoRepository.updateMemoAndTag(memo, memoUpdateDto);
@@ -74,15 +73,15 @@ public class MemoService implements MemoUseCase {
     }
 
     @Override
-    public void removeMemo(Long id, String keyword) throws MemoNotFoundException, UserNotFoundException {
+    public void removeMemo(Long id, String keyword) {
         User user = userService.userById(id);
 
         Memo memo = memoRepository.findByKeywordAndUser(keyword, user)
-                .orElseThrow(MemoNotFoundException::new);
+                .orElseThrow(() -> new BadRequestException(Exception.MEMO_NOT_FOUND));
 
         if (memo.getUser() != user) {
             log.error("본인 메모가 아닙니다. 메모 유저 = {}, 로그인 유저 = {}", user.getId(), id);
-            throw new UserNotFoundException("본인 메모가 아닙니다.");
+            throw new BadRequestException(Exception.NOT_YOUR_DATA);
         }
         // 메모태그 레코드 다 지우고
         tagMemoRepository.deleteMemo(memo);

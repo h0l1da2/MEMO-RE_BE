@@ -40,7 +40,7 @@ public class MemoController {
     }
 
     @DeleteMapping
-    public ResponseEntity<Response> deleteMemo(@RequestBody String keyword, HttpServletRequest request) throws UserNotFoundException, MemoNotFoundException {
+    public ResponseEntity<Response> deleteMemo(@RequestBody String keyword, HttpServletRequest request) {
         Long id = webService.getIdInHeader(request);
 
         String key = JsonStringConverter.jsonToString(keyword, "keyword");
@@ -50,7 +50,7 @@ public class MemoController {
     }
 
     @PutMapping
-    public ResponseEntity<Response> changeMemo(@RequestBody @Valid MemoUpdateDto memoUpdateDto, HttpServletRequest request) throws UserNotFoundException, DuplicateMemoException, MemoNotFoundException {
+    public ResponseEntity<Response> changeMemo(@RequestBody @Valid MemoUpdateDto memoUpdateDto, HttpServletRequest request) {
         /**
          * 원래 키워드 확인 후,
          * 있다면 전부 수정
@@ -64,7 +64,7 @@ public class MemoController {
     }
 
     @PostMapping
-    public ResponseEntity<Response> write(@RequestBody @Valid MemoWriteDto memoWriteDto, HttpServletRequest request) throws UserNotFoundException, DuplicateMemoException {
+    public ResponseEntity<Response> write(@RequestBody @Valid MemoWriteDto memoWriteDto, HttpServletRequest request) {
 
         Long id = webService.getIdInHeader(request);
 

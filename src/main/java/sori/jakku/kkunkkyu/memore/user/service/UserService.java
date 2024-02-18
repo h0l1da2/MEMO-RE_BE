@@ -5,13 +5,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import sori.jakku.kkunkkyu.memore.common.config.jwt.JwtToken;
+import sori.jakku.kkunkkyu.memore.common.config.jwt.TokenUseCase;
 import sori.jakku.kkunkkyu.memore.common.converter.JsonStringConverter;
+import sori.jakku.kkunkkyu.memore.common.exception.BadRequestException;
+import sori.jakku.kkunkkyu.memore.common.exception.Exception;
 import sori.jakku.kkunkkyu.memore.user.domain.User;
 import sori.jakku.kkunkkyu.memore.user.dto.UserDto;
-import sori.jakku.kkunkkyu.memore.common.exception.UsernameDuplException;
 import sori.jakku.kkunkkyu.memore.user.repository.UserRepository;
 
-import javax.security.auth.login.LoginException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -19,17 +24,12 @@ import javax.security.auth.login.LoginException;
 public class UserService implements UserUseCase {
 
     private final UserRepository userRepository;
+    private final TokenUseCase tokenUseCase;
     private final BCryptPasswordEncoder passwordEncoder;
 
     @Override
-    public boolean usernameDupl(String username) throws UsernameDuplException {
-
-        try {
-            username = JsonStringConverter.jsonToString(username, "username");
-        } catch (NullPointerException e) {
-            log.info("username is Null");
-            return false;
-        }
+    public boolean usernameDupl(String username) {
+        username = JsonStringConverter.jsonToString(Objects.requireNonNull(username), "username");
 
         // 아이디 조건 검증
         if (!usernameValid(username)){
@@ -37,50 +37,45 @@ public class UserService implements UserUseCase {
         }
 
         // 아이디 중복 검증
-        User user = userRepository.findByUsername(username);
+        User user = userRepository.findByUsername(username).orElse(null);
         if (user != null) {
             log.error("아이디 중복 = {}", username);
-            throw new UsernameDuplException("아이디가 중복입니다.");
+            throw new BadRequestException(Exception.DUPLICATED_USERNAME);
         }
 
         return true;
     }
 
     @Override
-    public UserDto signUp(UserDto userDto) throws UsernameDuplException {
+    public UserDto signUp(UserDto userDto) {
+        User findUser = userRepository.findByUsername(userDto.getUsername())
+                .orElse(null);
 
-        User findUser = userRepository.findByUsername(userDto.getUsername());
         if (findUser != null) {
             log.error("아이디 중복 = {}", findUser.getUsername());
-            throw new UsernameDuplException("아이디가 중복입니다.");
+            throw new BadRequestException(Exception.DUPLICATED_USERNAME);
         }
 
         userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
         User user = userRepository.save(new User(userDto));
+
         return new UserDto(user);
     }
 
     @Override
-    public User login(UserDto userDto) throws LoginException {
-
-        User findUser = userRepository.findByUsername(userDto.getUsername());
-        if (findUser == null) {
-            log.error("유저를 찾을 수 없음 = {}", userDto.getUsername());
-            throw new LoginException("유저 이름을 찾을 수 없습니다.");
-        }
+    public Map<String, String> login(UserDto userDto) {
+        User findUser = userRepository.findByUsername(userDto.getUsername())
+                .orElseThrow(() -> new BadRequestException(Exception.USER_NOT_FOUND));
 
         boolean matches = passwordEncoder.matches(userDto.getPassword(), findUser.getPassword());
         if (!matches) {
-            log.error("비밀번호가 다름 = {}", findUser.getPassword());
-            throw new LoginException("비밀번호가 다릅니다.");
+            log.error("비밀번호가 다름 = {}", findUser.getUsername());
+            throw new BadRequestException(Exception.USER_NOT_FOUND);
         }
 
-        return findUser;
-    }
-
-    @Override
-    public User userByUsername(String username) {
-        return userRepository.findByUsername(username);
+        Map<String, String> resultToken = new HashMap<>();
+        resultToken.put(JwtToken.ACCESS_TOKEN.getValue(), tokenUseCase.creatToken(findUser.getId(), findUser.getUsername()));
+        return resultToken;
     }
 
     @Override
