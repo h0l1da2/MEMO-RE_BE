@@ -12,7 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
 import sori.jakku.kkunkkyu.memore.config.jwt.TokenProvider;
-import sori.jakku.kkunkkyu.memore.config.jwt.TokenService;
+import sori.jakku.kkunkkyu.memore.config.jwt.TokenUseCase;
 import sori.jakku.kkunkkyu.memore.domain.User;
 import sori.jakku.kkunkkyu.memore.domain.dto.TagWriteDto;
 import sori.jakku.kkunkkyu.memore.repository.TagRepository;
@@ -35,7 +35,7 @@ class TagControllerTest {
     @Autowired
     private MockMvc mockMvc;
     @Autowired
-    private TokenService tokenService;
+    private TokenUseCase tokenService;
     @Autowired
     private TokenProvider tokenProvider;
 

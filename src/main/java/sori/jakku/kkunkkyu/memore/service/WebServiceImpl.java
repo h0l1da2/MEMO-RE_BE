@@ -7,14 +7,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
-import sori.jakku.kkunkkyu.memore.config.jwt.TokenService;
+import sori.jakku.kkunkkyu.memore.config.jwt.TokenUseCase;
 import sori.jakku.kkunkkyu.memore.service.inter.WebService;
 
 @Service
 @RequiredArgsConstructor
 public class WebServiceImpl implements WebService {
 
-    private final TokenService tokenService;
+    private final TokenUseCase tokenService;
 
     @Override
     public String jsonToString(String json, String value) {

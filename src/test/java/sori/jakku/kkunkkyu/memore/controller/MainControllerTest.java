@@ -9,9 +9,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
-import sori.jakku.kkunkkyu.memore.config.jwt.TokenService;
+import sori.jakku.kkunkkyu.memore.config.jwt.TokenUseCase;
 import sori.jakku.kkunkkyu.memore.domain.User;
 import sori.jakku.kkunkkyu.memore.domain.dto.TagDto;
 import sori.jakku.kkunkkyu.memore.repository.TagRepository;
@@ -35,7 +34,7 @@ class MainControllerTest {
     @Autowired
     private TagRepository tagRepository;
     @Autowired
-    private TokenService tokenService;
+    private TokenUseCase tokenService;
 
     @BeforeEach
     void clean() {

@@ -21,7 +21,7 @@ public class TokenProvider {
     @Value("${token.valid.time}")
     private int tokenValidTime;
 
-    private Key key;
+    private final Key key;
 
     public TokenProvider(@Value("${token.secret.key}") String secretKey) {
         key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
@@ -31,7 +31,7 @@ public class TokenProvider {
         Claims claims = getClaims(id, username);
 
         return Jwts.builder()
-                .setHeaderParam("typ", "Bearer")
+                .setHeaderParam(JwtToken.TYP.getValue(), JwtToken.BEARER.getValue())
                 .setClaims(claims)
                 .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
@@ -41,13 +41,13 @@ public class TokenProvider {
         Date now = new Date();
 
         Claims claims = Jwts.claims()
-                .setSubject("accessToken")
+                .setSubject(JwtToken.ACCESS_TOKEN.getValue())
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + tokenValidTime));
 
-        claims.put("id", id.toString());
-        claims.put("username", username);
-        claims.put("role", "[ROLE_USER]");
+        claims.put(JwtToken.ID.getValue(), id.toString());
+        claims.put(JwtToken.USERNAME.getValue(), username);
+        claims.put(JwtToken.ROLE.getValue(), JwtToken.ROLE_USER.getValue());
         return claims;
     }
 }

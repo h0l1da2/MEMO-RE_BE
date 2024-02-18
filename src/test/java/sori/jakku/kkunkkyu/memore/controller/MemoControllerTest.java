@@ -11,7 +11,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-import sori.jakku.kkunkkyu.memore.config.jwt.TokenService;
+import sori.jakku.kkunkkyu.memore.config.jwt.TokenUseCase;
 import sori.jakku.kkunkkyu.memore.domain.User;
 import sori.jakku.kkunkkyu.memore.domain.dto.MemoUpdateDto;
 import sori.jakku.kkunkkyu.memore.domain.dto.MemoWriteDto;
@@ -44,7 +44,7 @@ class MemoControllerTest {
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private TokenService tokenService;
+    private TokenUseCase tokenService;
     @Autowired
     private MemoService memoService;
     @Autowired

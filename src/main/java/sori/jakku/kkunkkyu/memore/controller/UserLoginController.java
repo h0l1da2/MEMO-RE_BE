@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import sori.jakku.kkunkkyu.memore.config.jwt.TokenService;
+import sori.jakku.kkunkkyu.memore.config.jwt.TokenUseCase;
 import sori.jakku.kkunkkyu.memore.domain.User;
 import sori.jakku.kkunkkyu.memore.domain.dto.UserDto;
 import sori.jakku.kkunkkyu.memore.service.inter.UserService;
@@ -24,7 +24,7 @@ import javax.security.auth.login.LoginException;
 public class UserLoginController {
 
     private final UserService userService;
-    private final TokenService tokenService;
+    private final TokenUseCase tokenService;
 
     @PostMapping
     public ResponseEntity<Response> login(@RequestBody @Valid UserDto userDto) throws LoginException {

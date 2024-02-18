@@ -16,7 +16,9 @@ import java.util.Date;
 @Slf4j
 @Component
 public class TokenParser {
+
     private final JwtParser jwtParser;
+
     public TokenParser(@Value("${token.secret.key}") String secretKey) {
         Key key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
         this.jwtParser = Jwts.parserBuilder().setSigningKey(key).build();
@@ -32,16 +34,15 @@ public class TokenParser {
 
     public Long getId(String token) {
         Claims claims = getClaims(token);
-        return Long.parseLong(claims.get("id", String.class));
+        return Long.parseLong(claims.get(JwtToken.ID.getValue(), String.class));
     }
 
     public String getUsername(String token) {
         Claims claims = getClaims(token);
-        return claims.get("username", String.class);
+        return claims.get(JwtToken.USERNAME.getValue(), String.class);
     }
 
     private Claims getClaims(String token) {
-        Claims claims = jwtParser.parseClaimsJws(token).getBody();
-        return claims;
+        return jwtParser.parseClaimsJws(token).getBody();
     }
 }

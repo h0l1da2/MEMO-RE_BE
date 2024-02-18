@@ -22,12 +22,11 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
 
-    private final TokenService tokenService;
+    private final TokenUseCase tokenService;
     private final UserDetailsService userDetailsService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-
         /**
          * 토큰 존재 여부 확인 (헤더)
          * 토큰 유효 확인
@@ -44,12 +43,14 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
-        token = token.substring("Bearer ".length());
+        // 'Bearer' + ' ' 띄어쓰기 포함해서 제거
+        token = token.substring(JwtToken.BEARER.getValue().length() + 1);
 
         // 토큰 유효 확인
         boolean valid = tokenService.tokenValid(token);
 
         if (!valid) {
+            log.debug("토큰 일치하지 않음.");
             HttpSession session = request.getSession(false);
             session.invalidate();
             filterChain.doFilter(request, response);
@@ -58,17 +59,23 @@ public class JwtFilter extends OncePerRequestFilter {
 
         // 토큰 재생성
         String reCreateToken = tokenService.reCreateToken(token);
-        // 쿠키 셋팅
-        Cookie cookie = new Cookie("token", reCreateToken);
-        response.addCookie(cookie);
+        // 헤더 셋팅
+        setTokenAtHeader(response, reCreateToken);
 
         // Authentication 생성
+        setAuthenticationAtSecurityContextHolder(token);
+
+        filterChain.doFilter(request, response);
+    }
+
+    private void setTokenAtHeader(HttpServletResponse response, String reCreateToken) {
+        response.setHeader(HttpHeaders.AUTHORIZATION, JwtToken.BEARER.getValue() + " " + reCreateToken);
+    }
+
+    private void setAuthenticationAtSecurityContextHolder(String token) {
         String username = tokenService.usernameByToken(token);
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, token, userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        filterChain.doFilter(request, response);
-
     }
 }
