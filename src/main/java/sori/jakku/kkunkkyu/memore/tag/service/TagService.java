@@ -52,10 +52,10 @@ public class TagService implements TagUseCase {
         Long id = webUseCase.getIdInHeader(request);
         User user = userUseCase.findById(id);
 
-        Tag findTag = tagRepository.findByNameAndUser(dto.getName(), user).orElse(null);
+        Tag findTag = tagRepository.findByNameAndUser(dto.name(), user).orElse(null);
 
         if (findTag != null) {
-            log.error("태그 중복 = {}", dto.getName());
+            log.error("태그 중복 = {}", dto.name());
             throw new BadRequestException(Exception.DUPLICATED_TAG);
         }
 
@@ -68,7 +68,7 @@ public class TagService implements TagUseCase {
         Long id = webUseCase.getIdInHeader(request);
         User user = userUseCase.findById(id);
 
-        Tag tag = tagRepository.findByNameAndUser(tagDto.getName(), user).orElseThrow(
+        Tag tag = tagRepository.findByNameAndUser(tagDto.name(), user).orElseThrow(
                 () -> new BadRequestException(Exception.TAG_NOT_FOUND)
         );
         tagRepository.delete(tag);

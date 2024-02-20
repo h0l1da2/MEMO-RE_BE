@@ -10,7 +10,7 @@ public interface TagMapper {
 
     default Tag toEntity(User user, TagDto dto) {
         return Tag.builder()
-                .name(dto.getName())
+                .name(dto.name())
                 .user(user)
                 .build();
     }

@@ -8,11 +8,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import sori.jakku.kkunkkyu.memore.domain.*;
 import sori.jakku.kkunkkyu.memore.memo.domain.Memo;
 import sori.jakku.kkunkkyu.memore.memo.dto.MemoListDto;
 import sori.jakku.kkunkkyu.memore.memo.dto.MemoUpdateDto;
 import sori.jakku.kkunkkyu.memore.memo.dto.MemoWriteDto;
+import sori.jakku.kkunkkyu.memore.tag.domain.QTag;
 import sori.jakku.kkunkkyu.memore.tag.domain.Tag;
 import sori.jakku.kkunkkyu.memore.tag.mapper.TagMapper;
 import sori.jakku.kkunkkyu.memore.tag.repository.TagRepository;
@@ -22,9 +22,9 @@ import sori.jakku.kkunkkyu.memore.user.domain.User;
 import java.util.ArrayList;
 import java.util.List;
 
-import static sori.jakku.kkunkkyu.memore.domain.QMemo.*;
-import static sori.jakku.kkunkkyu.memore.domain.QTag.*;
-import static sori.jakku.kkunkkyu.memore.domain.QTagMemo.*;
+import static sori.jakku.kkunkkyu.memore.memo.domain.QMemo.memo;
+import static sori.jakku.kkunkkyu.memore.tag.domain.QTag.tag;
+import static sori.jakku.kkunkkyu.memore.tagmemo.domain.QTagMemo.tagMemo;
 
 @Slf4j
 @Repository
