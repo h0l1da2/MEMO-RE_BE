@@ -43,13 +43,25 @@ dependencies {
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	annotationProcessor 'org.projectlombok:lombok'
 
-	// 롬복 뒤에 종속되어야 합니다.
-	implementation 'org.mapstruct:mapstruct:1.5.5.Final'
-	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+	// Mapstruct
+	implementation 'org.mapstruct:mapstruct:1.5.3.Final'
+	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.3.Final'
+	annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 }
+
+// Compile Time VM Options (1)
+compileJava {
+	options.compilerArgs += ['--enable-preview', '-Amapstruct.defaultComponentModel=spring']
+}
+
+// Compile Time VM Options (2)
+compileTestJava {
+	options.compilerArgs += ['--enable-preview', '-Amapstruct.defaultComponentModel=spring']
+}
+
 
 jar {
 	enabled = false
