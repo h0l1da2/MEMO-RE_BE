@@ -5,15 +5,11 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import sori.jakku.kkunkkyu.memore.common.converter.JsonStringConverter;
 import sori.jakku.kkunkkyu.memore.memo.dto.MemoListDto;
 import sori.jakku.kkunkkyu.memore.memo.dto.MemoUpdateDto;
 import sori.jakku.kkunkkyu.memore.memo.dto.MemoWriteDto;
 import sori.jakku.kkunkkyu.memore.memo.service.MemoUseCase;
-import sori.jakku.kkunkkyu.memore.common.web.WebUseCase;
-import sori.jakku.kkunkkyu.memore.web.Response;
 
 import java.util.List;
 
@@ -23,51 +19,25 @@ import java.util.List;
 public class MemoController {
 
     private final MemoUseCase memoService;
-    private final WebUseCase webService;
 
     @GetMapping
-    public ResponseEntity<Response> list(@RequestParam(required = false) String tag, @PageableDefault(size = 12) Pageable pageable, HttpServletRequest request) {
-
-        Long id = webService.getIdInHeader(request);
-        List<MemoListDto> memoList = memoService.memoList(id, pageable, tag);
-
-        String memoListJson = JsonStringConverter.objectToJson(memoList);
-
-        return Response.ok(memoListJson);
+    public List<MemoListDto> list(@RequestParam(required = false) String tag, @PageableDefault(size = 12) Pageable pageable, HttpServletRequest request) {
+        return memoService.memoList(request, pageable, tag);
     }
 
     @DeleteMapping
-    public ResponseEntity<Response> deleteMemo(@RequestBody String keyword, HttpServletRequest request) {
-        Long id = webService.getIdInHeader(request);
-
-        String key = JsonStringConverter.jsonToString(keyword, "keyword");
-        memoService.removeMemo(id, key);
-
-        return Response.ok();
+    public void deleteMemo(@RequestBody String keyword, HttpServletRequest request) {
+        memoService.removeMemo(request, keyword);
     }
 
     @PutMapping
-    public ResponseEntity<Response> changeMemo(@RequestBody @Valid MemoUpdateDto memoUpdateDto, HttpServletRequest request) {
-        /**
-         * 원래 키워드 확인 후,
-         * 있다면 전부 수정
-         * 태그테이블도 삭제
-         */
-        Long id = webService.getIdInHeader(request);
-
-        memoService.changeMemo(id, memoUpdateDto);
-
-        return Response.ok();
+    public void changeMemo(@RequestBody @Valid MemoUpdateDto memoUpdateDto, HttpServletRequest request) {
+        memoService.changeMemo(request, memoUpdateDto);
     }
 
     @PostMapping
-    public ResponseEntity<Response> write(@RequestBody @Valid MemoWriteDto memoWriteDto, HttpServletRequest request) {
-
-        Long id = webService.getIdInHeader(request);
-
-        memoService.write(id, memoWriteDto);
-
-        return Response.ok();
+    public void write(@RequestBody @Valid MemoWriteDto memoWriteDto, HttpServletRequest request) {
+        memoService.write(request, memoWriteDto);
     }
 
 }

@@ -1,11 +1,14 @@
 package sori.jakku.kkunkkyu.memore.memo.service;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import sori.jakku.kkunkkyu.memore.common.converter.JsonStringConverter;
 import sori.jakku.kkunkkyu.memore.common.exception.*;
 import sori.jakku.kkunkkyu.memore.common.exception.Exception;
+import sori.jakku.kkunkkyu.memore.common.web.WebUseCase;
 import sori.jakku.kkunkkyu.memore.memo.domain.Memo;
 import sori.jakku.kkunkkyu.memore.memo.dto.MemoListDto;
 import sori.jakku.kkunkkyu.memore.user.domain.User;
@@ -25,10 +28,12 @@ public class MemoService implements MemoUseCase {
     private final MemoRepository memoRepository;
     private final UserUseCase userService;
     private final TagQueryRepository tagMemoRepository;
+    private final WebUseCase webUseCase;
 
 
     @Override
-    public void write(Long id, MemoWriteDto memoWriteDto) {
+    public void write(HttpServletRequest request, MemoWriteDto memoWriteDto) {
+        Long id = webUseCase.getIdInHeader(request);
         User user = userService.findById(id);
 
         if (user == null) {
@@ -50,7 +55,8 @@ public class MemoService implements MemoUseCase {
     }
 
     @Override
-    public void changeMemo(Long id, MemoUpdateDto memoUpdateDto) {
+    public void changeMemo(HttpServletRequest request, MemoUpdateDto memoUpdateDto) {
+        Long id = webUseCase.getIdInHeader(request);
         User user = userService.findById(id);
 
         Memo memo = memoRepository.findByKeywordAndUser(memoUpdateDto.getOriginKey(), user)
@@ -73,10 +79,13 @@ public class MemoService implements MemoUseCase {
     }
 
     @Override
-    public void removeMemo(Long id, String keyword) {
+    public void removeMemo(HttpServletRequest request, String keyword) {
+        Long id = webUseCase.getIdInHeader(request);
         User user = userService.findById(id);
 
-        Memo memo = memoRepository.findByKeywordAndUser(keyword, user)
+        String key = JsonStringConverter.jsonToString(keyword, "keyword");
+
+        Memo memo = memoRepository.findByKeywordAndUser(key, user)
                 .orElseThrow(() -> new BadRequestException(Exception.MEMO_NOT_FOUND));
 
         if (memo.getUser() != user) {
@@ -89,13 +98,13 @@ public class MemoService implements MemoUseCase {
     }
 
     @Override
-    public List<MemoListDto> memoList(Long id, Pageable pageable, String tag) {
+    public List<MemoListDto> memoList(HttpServletRequest request, Pageable pageable, String tag) {
         /**
          * 메모 가져오기
          * 그 메모로 태그메모 싹 가져오기
          * 태그메모로 태그 가져오기
          */
-        // 페이지에 맞는 메모 다 가져오기
+        Long id = webUseCase.getIdInHeader(request);
         return tagMemoRepository.findAllForList(id, pageable, tag);
     }
 }

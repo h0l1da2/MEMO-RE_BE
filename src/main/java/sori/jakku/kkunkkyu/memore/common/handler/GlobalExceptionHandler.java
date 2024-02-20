@@ -1,41 +1,27 @@
 package sori.jakku.kkunkkyu.memore.common.handler;
 
-import com.google.gson.JsonObject;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import sori.jakku.kkunkkyu.memore.web.Response;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
     // @Valid 관련 Exception
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Response> invalidRequestHandler(MethodArgumentNotValidException e) {
+    public Map<String, String> invalidRequestHandler(MethodArgumentNotValidException e) {
 
-        JsonObject jsonObject = new JsonObject();
+        Map<String, String> resultMap = new HashMap<>();
 
         for (FieldError error : e.getFieldErrors()) {
-            if (error.getField().equals("username")) {
-                jsonObject.addProperty("response", "BAD_USERNAME");
-            }
-            if (error.getField().equals("password")) {
-                jsonObject.addProperty("response", "BAD_PWD");
-            }
-            if (error.getField().equals("keyword")) {
-                jsonObject.addProperty("response", "BAD");
-            }
-            if (error.getField().equals("tag") && e.getMessage().contains("size")) {
-                jsonObject.addProperty("response", "SIZE");
-            }
-            if (error.getField().equals("tag")) {
-                jsonObject.addProperty("response", "TAG_NOT_VALID");
-            }
+            resultMap.put(error.getField(), e.getMessage());
         }
 
-        return Response.badRequest(jsonObject.toString());
+        return resultMap;
     }
 
 }
