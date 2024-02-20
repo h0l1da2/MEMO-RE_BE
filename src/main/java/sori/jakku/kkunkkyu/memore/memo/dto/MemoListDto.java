@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import sori.jakku.kkunkkyu.memore.common.annotation.Memo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +19,7 @@ public class MemoListDto {
     @Builder.Default
     private List<String> tag = new ArrayList<>();
 
-    public MemoListDto(String keyword, String content) {
+    public MemoListDto(@Memo String keyword, String content) {
         this.keyword = keyword;
         this.content = content;
     }

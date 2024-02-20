@@ -1,12 +1,9 @@
 package sori.jakku.kkunkkyu.memore.tag.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import sori.jakku.kkunkkyu.memore.common.annotation.Tag;
 
 public record TagDto(
-        @NotBlank @Size(min = 1, max = 20)
-        @Pattern(regexp = ".*[ㄱ-ㅎㅏ-ㅣ가-힣a-zA-Z\\d+.]+.*")
+        @Tag
         String name
 ) {
 }

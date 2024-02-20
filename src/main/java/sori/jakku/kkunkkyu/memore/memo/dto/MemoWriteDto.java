@@ -1,10 +1,10 @@
 package sori.jakku.kkunkkyu.memore.memo.dto;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import sori.jakku.kkunkkyu.memore.common.annotation.Memo;
 
 import java.util.List;
 
@@ -13,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 public class MemoWriteDto {
 
-    @NotBlank @Size(min = 1, max = 20)
+    @Memo
     private String keyword;
     @Size(max = 100)
     private String content;

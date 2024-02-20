@@ -1,10 +1,8 @@
 package sori.jakku.kkunkkyu.memore.user.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import sori.jakku.kkunkkyu.memore.common.annotation.Username;
 
 public record UsernameValidDto(
-        @NotBlank @Size(min = 4, max = 15) @Pattern(regexp = "^[a-z0-9]+$")
+        @Username
         String username
 ){}
