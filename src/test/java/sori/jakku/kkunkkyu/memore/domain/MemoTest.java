@@ -4,8 +4,9 @@ package sori.jakku.kkunkkyu.memore.domain;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import sori.jakku.kkunkkyu.memore.common.exception.BadRequestException;
+import sori.jakku.kkunkkyu.memore.common.exception.Exception;
 import sori.jakku.kkunkkyu.memore.memo.domain.Memo;
-import sori.jakku.kkunkkyu.memore.user.domain.User;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -14,18 +15,19 @@ import static org.mockito.Mockito.*;
 public class MemoTest {
 
     private Memo memo;
+    private Long ownerId;
+    private Long otherUserId;
 
     @BeforeEach
     void setUp() {
-        this.memo = mock(Memo.class);
-    }
+        ownerId = 1L;
+        otherUserId = 2L;
 
-    private User createUser(Long userId) {
-        return User.builder()
-                .id(userId)
-                .username("username")
-                .password("password")
-                .build();
+        memo = mock(Memo.class);
+        doNothing().when(memo).checkAuthorizedUser(ownerId);
+
+        doThrow(new BadRequestException(Exception.MEMO_NOT_FOUND))
+                .when(memo).checkAuthorizedUser(otherUserId);
     }
 
     private Memo createMemo() {
@@ -45,7 +47,7 @@ public class MemoTest {
         Memo memo = createMemo();
         Memo sameMemo = createMemo();
 
-        memo.changeMemo(keyword, content);
+        memo.updateMemo(keyword, content);
 
         assertNotEquals(memo.getKeyword(), sameMemo.getKeyword());
         assertNotEquals(memo.getContent(), sameMemo.getContent());

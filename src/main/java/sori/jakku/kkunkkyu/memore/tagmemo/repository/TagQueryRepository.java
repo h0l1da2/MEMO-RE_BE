@@ -88,7 +88,7 @@ public class TagQueryRepository {
          */
 
         Memo findMemo = em.merge(memo);
-        findMemo.changeMemo(memoUpdateDto.getNewKey(), memoUpdateDto.getContent());
+        findMemo.updateMemo(memoUpdateDto.getNewKey(), memoUpdateDto.getContent());
 
         memoUpdateDto.getTag().forEach((key, value) -> {
                     // 태그가 이미 있는 거면 놔두고, 없으면 태그메모테이블과 태그에 새로 추가
