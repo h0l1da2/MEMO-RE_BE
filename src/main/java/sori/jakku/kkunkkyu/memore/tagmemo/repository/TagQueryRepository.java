@@ -12,11 +12,13 @@ import sori.jakku.kkunkkyu.memore.memo.domain.Memo;
 import sori.jakku.kkunkkyu.memore.memo.dto.MemoListDto;
 import sori.jakku.kkunkkyu.memore.memo.dto.MemoUpdateDto;
 import sori.jakku.kkunkkyu.memore.memo.dto.MemoWriteDto;
+import sori.jakku.kkunkkyu.memore.memo.mapper.MemoMapper;
 import sori.jakku.kkunkkyu.memore.tag.domain.QTag;
 import sori.jakku.kkunkkyu.memore.tag.domain.Tag;
 import sori.jakku.kkunkkyu.memore.tag.mapper.TagMapper;
 import sori.jakku.kkunkkyu.memore.tag.repository.TagRepository;
 import sori.jakku.kkunkkyu.memore.tagmemo.domain.TagMemo;
+import sori.jakku.kkunkkyu.memore.tagmemo.mapper.TagMemoMapper;
 import sori.jakku.kkunkkyu.memore.user.domain.User;
 
 import java.util.ArrayList;
@@ -33,12 +35,13 @@ public class TagQueryRepository {
 
     private final TagRepository tagRepository;
     private final TagMapper tagMapper;
+    private final MemoMapper memoMapper;
+    private final TagMemoMapper tagMemoMapper;
     private final EntityManager em;
     private final JPAQueryFactory query;
 
     @Transactional
     public void saveTagAndMemo(User user, MemoWriteDto memoWriteDto) {
-
         /**
          * 태그 있는지 확인 후, 있는데 DB 에 없으면 추가
          * 메모 추가
@@ -46,7 +49,7 @@ public class TagQueryRepository {
          */
         em.merge(user);
 
-        Memo memo = new Memo(user, memoWriteDto.getKeyword());
+        Memo memo = memoMapper.toEntity(user, memoWriteDto.getKeyword());
 
         String memoContent = memoWriteDto.getContent();
 
@@ -57,11 +60,10 @@ public class TagQueryRepository {
         em.persist(memo);
 
         List<Tag> tagList = new ArrayList<>();
-
         List<String> dtoTagList = memoWriteDto.getTag();
 
         if (dtoTagList != null) {
-            dtoTagList.stream().forEach(
+            dtoTagList.forEach(
                     name -> {
                         Tag newTag = tagMapper.toEntity(user, name);
                         em.persist(newTag);
@@ -71,7 +73,8 @@ public class TagQueryRepository {
 
         // 태그메모 추가
         tagList.forEach(tag ->
-                em.persist(new TagMemo(memo, tag)));
+                em.persist(tagMemoMapper.toEntity(memo, tag))
+        );
 
         em.close();
 
@@ -89,17 +92,17 @@ public class TagQueryRepository {
 
         memoUpdateDto.getTag().forEach((key, value) -> {
                     // 태그가 이미 있는 거면 놔두고, 없으면 태그메모테이블과 태그에 새로 추가
-                    if (value == true) {
+                    if (value) {
                         Tag tag = tagRepository.findByNameAndUser(key, memo.getUser()).orElse(null);
                         if (tag == null) {
 
                             tag = tagMapper.toEntity(memo.getUser(), key);
                             em.persist(tag);
                         }
-                        em.persist(new TagMemo(findMemo, tag));
+                        em.persist(tagMemoMapper.toEntity(findMemo, tag));
                     }
                     // 없애는 태그
-                    if (value == false) {
+                    if (!value) {
                         Tag findTag = tagRepository.findByNameAndUser(key, memo.getUser()).orElse(null);
 
                         TagMemo findTagMemo = null;
