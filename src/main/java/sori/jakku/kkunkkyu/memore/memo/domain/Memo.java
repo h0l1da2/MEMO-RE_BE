@@ -21,7 +21,7 @@ public class Memo {
     @JoinColumn(name = "user_id")
     private User user;
 
-    public void changeMemo(String keyword, String content) {
+    public void updateMemo(String keyword, String content) {
         this.keyword = keyword;
         this.content = content;
     }
