@@ -1,13 +1,16 @@
 package sori.jakku.kkunkkyu.memore.memo.domain;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import sori.jakku.kkunkkyu.memore.common.exception.BadRequestException;
+import sori.jakku.kkunkkyu.memore.common.exception.Exception;
 import sori.jakku.kkunkkyu.memore.user.domain.User;
 
 @Getter
 @Entity
-@NoArgsConstructor
+@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Memo {
 
     @Id @GeneratedValue
@@ -18,10 +21,6 @@ public class Memo {
     @JoinColumn(name = "user_id")
     private User user;
 
-    public Memo(User user, String keyword) {
-        this.user = user;
-        this.keyword = keyword;
-    }
     public void changeMemo(String keyword, String content) {
         this.keyword = keyword;
         this.content = content;
@@ -29,5 +28,12 @@ public class Memo {
 
     public void writeOnlyContent(String content) {
         this.content = content;
+    }
+
+    // 보안을 위해 메모가 없다는 메시지를 띄운다.
+    public void checkAuthorizedUser(Long requesterId) {
+        if(!user.getId().equals(requesterId)){
+            throw new BadRequestException(Exception.MEMO_NOT_FOUND);
+        }
     }
 }

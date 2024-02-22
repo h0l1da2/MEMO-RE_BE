@@ -7,7 +7,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import sori.jakku.kkunkkyu.memore.user.dto.LoginDto;
 
 @Entity
 @Getter
@@ -20,16 +19,6 @@ public class User {
     private Long id;
     private String username;
     private String password;
-
-    public User(String username, String password) {
-        this.username = username;
-        this.password = password;
-    }
-
-    public User(LoginDto loginDto) {
-        this.username = loginDto.username();
-        this.password = loginDto.password();
-    }
 
     public void encodedPassword(String encodePwd) {
         this.password = encodePwd;

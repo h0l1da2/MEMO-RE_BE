@@ -20,8 +20,4 @@ public class TagMemo {
     @JoinColumn(name = "tag_id")
     private Tag tag;
 
-    public TagMemo(Memo memo, Tag tag) {
-        this.memo = memo;
-        this.tag = tag;
-    }
 }
